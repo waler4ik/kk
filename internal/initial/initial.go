@@ -25,10 +25,10 @@ func Walk(content embed.FS, templateDir string, config config.Config) error {
 			if err := os.MkdirAll(cleanPath(path, templateDir), os.ModePerm); err != nil {
 				return fmt.Errorf("MkdirAll %s: %s", path, err)
 			}
-		} else if strings.HasSuffix(path, ".gotmpl") {
+		} else if strings.HasSuffix(path, ".tmpl") {
 			tt := template.Must(template.ParseFS(content, path))
 			for _, t := range tt.Templates() {
-				filePath := strings.Replace(cleanPath(path, templateDir), ".gotmpl", ".go", 1)
+				filePath := strings.TrimSuffix(cleanPath(path, templateDir), ".tmpl")
 				if _, err := os.Stat(filePath); err == nil {
 					if currentFile, err := os.ReadFile(filePath); err != nil {
 						return fmt.Errorf("ReadFile %s: %s", filePath, err)
