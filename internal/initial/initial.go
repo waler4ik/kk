@@ -21,6 +21,10 @@ func Walk(content embed.FS, templateDir, rootFolder string, config config.Config
 			return nil
 		}
 
+		if err := os.MkdirAll(rootFolder, os.ModePerm); err != nil {
+			return fmt.Errorf("MkdirAll %s: %s", path, err)
+		}
+
 		if d.IsDir() {
 			if err := os.MkdirAll(replacePrefix(path, templateDir, rootFolder), os.ModePerm); err != nil {
 				return fmt.Errorf("MkdirAll %s: %s", path, err)
