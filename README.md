@@ -3,7 +3,7 @@
 ## Install kk
 
 ```zsh
-go install github.com/waler4ik/kk 
+go install github.com/waler4ik/kk@latest
 ```
 After installation use `kk` command in your shell.
 
