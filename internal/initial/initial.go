@@ -43,12 +43,18 @@ func Walk(content embed.FS, templateDir, rootFolder string, config config.Config
 				if err != nil {
 					return fmt.Errorf("create %s: %s", filePath, err)
 				}
+				defer f.Close()
 				if err := t.Execute(f, config); err != nil {
 					return fmt.Errorf("execute %s: %s", path, err)
 				}
 			}
 		} else {
-			return nil
+			filePath := replacePrefix(path, templateDir, rootFolder)
+			f, err := os.Create(filePath)
+			if err != nil {
+				return fmt.Errorf("create %s: %s", filePath, err)
+			}
+			defer f.Close()
 		}
 		return nil
 	}); err != nil {
