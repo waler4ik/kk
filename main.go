@@ -16,16 +16,17 @@ import (
 var content embed.FS
 
 func main() {
-	config := config.Config{}
-	parser := flags.NewParser(&config, flags.Default)
+	config := config.Init{}
+	parser := flags.NewNamedParser("kk", flags.Default)
 	parser.ShortDescription = "kk - a Golang tool"
 	parser.LongDescription = "kk - easily create, setup and extend a Golang projects. No more copying files and endless renaming."
+	parser.AddCommand("init", "Creates a Golang project from internal templates", "Creates a Golang project for rest, grpc, graphql in separate folder", &config)
 	if _, err := parser.Parse(); err != nil {
-		log.Fatalf("Parsing arguments failed: %s", err)
+		return
 	}
 
 	if len(os.Args) < 2 {
-		log.Fatalf("Provide more arguments. Example: kk init --modulename github.com/yourworkspace/CoolModuleName")
+		parser.WriteHelp(os.Stdout)
 	} else if os.Args[1] == "init" {
 		if config.ProjectType == "rest" {
 			rootFolder := strings.ToLower(path.Base(config.ModuleName))
