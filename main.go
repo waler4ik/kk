@@ -4,6 +4,8 @@ import (
 	"embed"
 	"log"
 	"os"
+	"path"
+	"strings"
 
 	flags "github.com/jessevdk/go-flags"
 	"github.com/waler4ik/kk/internal/config"
@@ -26,7 +28,8 @@ func main() {
 		log.Fatalf("Provide more arguments. Example: kk init --modulename github.com/yourworkspace/CoolModuleName")
 	} else if os.Args[1] == "init" {
 		if config.ProjectType == "rest" {
-			if err := initial.Walk(content, "templates/"+config.ProjectType, config); err != nil {
+			rootFolder := strings.ToLower(path.Base(config.ModuleName))
+			if err := initial.Walk(content, "templates/"+config.ProjectType, rootFolder, config); err != nil {
 				log.Fatalln(err)
 			}
 		} else {
