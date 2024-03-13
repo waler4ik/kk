@@ -12,7 +12,7 @@ func Test_main(t *testing.T) {
 	}{
 		{
 			name: "init",
-			args: []string{"kk", "init", "--modulename=github.com/yourworkspace/CoolModuleName"},
+			args: []string{"kk", "init", "--modulepath=github.com/yourworkspace/CoolModuleName"},
 		},
 		{
 			name: "add",

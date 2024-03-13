@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	ModuleName  string `long:"modulename" short:"m" description:"golang module name" default:"rename-or-delete-me"`
+	ModulePath  string `long:"modulepath" short:"m" description:"golang module path" default:"rename-or-delete-me"`
 	ProjectType string `long:"projecttype" short:"p" description:"golang project type e.g. rest, grpc, graphql" default:"rest"`
 }
 
@@ -22,7 +22,7 @@ type Init struct {
 
 func (i *Init) Execute(args []string) error {
 	if i.ProjectType == "rest" {
-		rootFolder := strings.ToLower(path.Base(i.ModuleName))
+		rootFolder := strings.ToLower(path.Base(i.ModulePath))
 		if err := walk.Walk(i.Content, "templates/"+i.ProjectType, rootFolder, i.Config); err != nil {
 			return err
 		}
