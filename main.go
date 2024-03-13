@@ -19,7 +19,7 @@ func main() {
 	initCMD := initial.Init{Content: content}
 	parser.AddCommand("init", "Creates a Golang project from internal templates", "Creates a Golang project for REST, GRPC, GraphQL in separate folder", &initCMD)
 
-	addCMD := add.Add{}
+	addCMD := add.Add{Content: content}
 	parser.AddCommand("add", "Adds a resource to current project", "Adds and properly wires REST resource", &addCMD)
 
 	if _, err := parser.Parse(); err != nil {
