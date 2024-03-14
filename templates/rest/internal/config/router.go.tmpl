@@ -3,10 +3,22 @@
 package config
 
 import (
-	"{{.ModuleName}}/internal/api"
+	"{{.ModulePath}}/internal/api"
+	{{- range .Packages }}
+	"{{$.ModulePath}}/{{.RelPath}}"
+  	{{- end }}
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func ConfigureRouter(a *api.API) http.Handler {
-	return nil
+	r := chi.NewRouter()
+
+	ConfigureMiddleware(r)
+	{{- range .Packages }}
+	{{.Name}}.ConfigureRouter(a, r)
+  	{{- end }}
+
+	return r
 }
