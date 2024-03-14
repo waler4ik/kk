@@ -21,6 +21,7 @@ import (
 
 const RESTResource = "resource"
 const WiringRouterFunctionName = "ConfigureRouter"
+const WiringRouterFunctionContainingFile = "controller.go"
 
 type Config struct {
 	Args struct {
@@ -54,9 +55,11 @@ func (a *Add) Execute(args []string) error {
 		if a.Args.Path == "" {
 			return fmt.Errorf("provide path for the REST resource")
 		}
+
 		if !strings.HasPrefix(a.Args.Path, "/") {
 			a.Args.Path = "/" + a.Args.Path
 		}
+
 		a.prepareResourceNames()
 
 		if err := a.readModulePath(); err != nil {
@@ -67,41 +70,10 @@ func (a *Add) Execute(args []string) error {
 			return err
 		}
 
-		if err := filepath.Walk("internal/endpoints",
-			func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-
-				fset := token.NewFileSet()
-
-				if info.IsDir() {
-					if pkgMap, err := parser.ParseDir(fset, path,
-						func(fi fs.FileInfo) bool {
-							return fi.Name() == "controller.go"
-						},
-						0); err != nil {
-						return fmt.Errorf("ParseDir: %w", err)
-					} else {
-						for _, pkg := range pkgMap {
-							for _, file := range pkg.Files {
-								for _, decl := range file.Decls {
-									if funcDecl, ok := decl.(*ast.FuncDecl); ok && funcDecl.Name.String() == WiringRouterFunctionName {
-										a.Packages = append(a.Packages, Package{
-											Name:    pkg.Name,
-											RelPath: path,
-										})
-									}
-								}
-							}
-						}
-					}
-				}
-
-				return nil
-			}); err != nil {
-			return fmt.Errorf("filepath walk: %w", err)
+		if err := a.collectEndpointPackageInfoForWiring("internal/endpoints"); err != nil {
+			return err
 		}
+
 		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", a); err != nil {
 			return err
 		}
@@ -136,4 +108,42 @@ func (a *Add) prepareResourceNames() {
 	pathBaseSg := inflector.Singularize(pathBase)
 	a.ResourceNameSgCaps = cases.Title(language.English).String(pathBaseSg)
 	a.ResourceNameSgLower = strings.ToLower(pathBaseSg)
+}
+
+func (a *Add) collectEndpointPackageInfoForWiring(root string) error {
+	if err := filepath.Walk(root,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			fset := token.NewFileSet()
+
+			if info.IsDir() {
+				if pkgMap, err := parser.ParseDir(fset, path,
+					func(fi fs.FileInfo) bool {
+						return fi.Name() == WiringRouterFunctionContainingFile
+					},
+					0); err != nil {
+					return fmt.Errorf("ParseDir: %w", err)
+				} else {
+					for _, pkg := range pkgMap {
+						for _, file := range pkg.Files {
+							for _, decl := range file.Decls {
+								if funcDecl, ok := decl.(*ast.FuncDecl); ok && funcDecl.Name.String() == WiringRouterFunctionName {
+									a.Packages = append(a.Packages, Package{
+										Name:    pkg.Name,
+										RelPath: path,
+									})
+								}
+							}
+						}
+					}
+				}
+			}
+			return nil
+		}); err != nil {
+		return fmt.Errorf("filepath walk: %w", err)
+	}
+	return nil
 }
