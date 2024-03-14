@@ -1,4 +1,6 @@
-# kk - Create, setup and extend a Golang project in seconds
+# kk - Golang boilerplate command tool
+> [!TIP]
+> Create, setup and extend a Golang project in seconds
 
 ## Install kk
 
@@ -29,7 +31,7 @@ Build and start your service with the commands below. Then check your endpoints 
 docker compose build && docker compose up -d
 ```
 
-## Upcoming features(commands)
+## Upcoming features (commands)
 - [ ] Add websocket command
 - [ ] Switch router command (e.g chi -> gorilla)
 - [ ] Add kubernetes scripts command
