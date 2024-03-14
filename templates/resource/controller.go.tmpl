@@ -35,7 +35,7 @@ func ConfigureRouter(a *api.API, r *chi.Mux) {
 		r.With(Paginate).Get("/", {{.ResourceNamePlLower}}Controller.List{{.ResourceNamePlCaps}})
 		r.Post("/", {{.ResourceNamePlLower}}Controller.Create{{.ResourceNameSgCaps}})
 
-		r.Route("{ {{- .ResourceNameSgLower}}ID}", func(r chi.Router) {
+		r.Route("/{ {{- .ResourceNameSgLower}}ID}", func(r chi.Router) {
 			r.Use({{.ResourceNamePlLower}}Controller.{{.ResourceNameSgCaps}}Ctx)
 			r.Get("/", {{.ResourceNamePlLower}}Controller.Get{{.ResourceNameSgCaps}})
 			r.Put("/", {{.ResourceNamePlLower}}Controller.Update{{.ResourceNameSgCaps}})
