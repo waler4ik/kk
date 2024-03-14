@@ -29,3 +29,10 @@ Build and start your service with the commands below. Then check your endpoints 
 docker compose build && docker compose up -d
 ```
 
+## Upcoming features(commands)
+- [ ] Add websocket command
+- [ ] Switch router command (e.g chi -> gorilla)
+- [ ] Add kubernetes scripts command
+- [ ] Add github scripts command
+- [ ] Generate swagger/openapi specification command
+
