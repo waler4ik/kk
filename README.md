@@ -1,4 +1,4 @@
-# kk - Golang boilerplate command tool
+# kk - Golang boilerplate CLI tool
 > [!TIP]
 > Create, setup and extend a Golang project in seconds
 
