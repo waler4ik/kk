@@ -17,13 +17,14 @@ type Config struct {
 type Init struct {
 	Config
 
-	Content embed.FS
+	Content  embed.FS
+	Packages []any //Dummy member in order to be able to process router.go.tmpl template, implement it later if necessary
 }
 
 func (i *Init) Execute(args []string) error {
 	if i.ProjectType == "rest" {
 		rootFolder := strings.ToLower(path.Base(i.ModulePath))
-		if err := walk.Walk(i.Content, "templates/"+i.ProjectType, rootFolder, i.Config); err != nil {
+		if err := walk.Walk(i.Content, "templates/"+i.ProjectType, rootFolder, i); err != nil {
 			return err
 		}
 	} else {
