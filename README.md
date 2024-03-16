@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="logo.png" width="550" height="600">
+    <img src="logo.png" width="450" height="500">
 </p>
 
 # kk - Golang boilerplate CLI tool
