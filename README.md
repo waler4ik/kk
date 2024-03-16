@@ -1,6 +1,6 @@
 # kk - Golang boilerplate CLI tool
 > [!TIP]
-> Create, setup and extend a Golang project in seconds
+> Create, setup and extend a Golang project like a puzzle in seconds
 
 ## Install kk
 
@@ -22,11 +22,11 @@ Creates and wires a REST resource endpoint
 ```zsh
 kk add resource machines/data
 ```
-After adding a resource implement the endpoint business logic in `internal/endpoints/machines/data/provider.go` and `internal/endpoints/machines/data/model.go`. 
-Warning: Paths may be different depending on the path given in the command arguments above.
+After adding a resource implement the endpoint business logic in `internal/endpoints/machines/data/provider.go` and `internal/endpoints/machines/data/model.go`.
+Paths may be different depending on the path given in the command arguments above.
 
 ### Testing your service locally
-Build and start your service with the commands below. Then check your endpoints using a tool of your choice.
+After running `kk init`, build and start your service with the commands below. Then check your endpoints using a tool of your choice.
 ```zsh
 docker compose build && docker compose up -d
 ```
@@ -38,3 +38,5 @@ docker compose build && docker compose up -d
 - [ ] Add github scripts command
 - [ ] Generate swagger/openapi specification command
 
+## Similar approaches 
+- https://github.com/hay-kot/scaffold This tool gives you the possibility to write your own templates.
