@@ -1,4 +1,6 @@
-<img src="logo.png" width="550" height="600">
+<p align="center">
+    <img src="logo.png" width="550" height="600">
+</p>
 
 # kk - Golang boilerplate CLI tool
 > [!TIP]
