@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="logo.png" width="300" height="350">
+</p>
+
 # kk - Golang boilerplate CLI tool
 > [!TIP]
 > Create, setup and extend a Golang project like a puzzle in seconds
