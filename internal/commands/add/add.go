@@ -23,11 +23,17 @@ const RESTResource = "resource"
 const WiringRouterFunctionName = "ConfigureRouter"
 const WiringRouterFunctionContainingFile = "controller.go"
 
-type Config struct {
+type Arguments struct {
 	Args struct {
 		ResourceType string `positional-arg-name:"resourcetype" description:"type of code to add e.g. \"resource\" for a REST resource" required:"yes"`
 		Path         string `positional-arg-name:"path" description:"path e.g \"customer\" for the REST resource /customer"`
 	} `positional-args:"yes"`
+}
+
+type Add struct {
+	Arguments
+
+	Content embed.FS
 }
 
 type Package struct {
@@ -35,19 +41,15 @@ type Package struct {
 	RelPath string
 }
 
-type Add struct {
-	Config
-
-	Content embed.FS
-
+type TemplateInput struct {
 	ModulePath          string
 	PathBase            string
 	ResourceNameSgCaps  string //Singular caps e.g Machine
 	ResourceNameSgLower string //Singular lowercase e.g machine
 	ResourceNamePlCaps  string //Plural caps e.g Machines
 	ResourceNamePlLower string //Plural lowercase e.g machines
-
-	Packages []Package
+	RoutePath           string
+	Packages            []Package
 }
 
 func (a *Add) Execute(args []string) error {
@@ -60,21 +62,24 @@ func (a *Add) Execute(args []string) error {
 			a.Args.Path = "/" + a.Args.Path
 		}
 
-		a.prepareResourceNames()
-
-		if err := a.readModulePath(); err != nil {
+		ti := &TemplateInput{}
+		prepareResourceNames(a.Arguments, ti)
+		if modPath, err := readModulePath(); err != nil {
 			return fmt.Errorf("readModulePath: %w", err)
+		} else {
+			ti.ModulePath = modPath
 		}
+		ti.RoutePath = a.Args.Path
 
-		if err := walk.Walk(a.Content, "templates/"+a.Args.ResourceType, filepath.Clean("internal/endpoints"+a.Args.Path), a); err != nil {
+		if err := walk.Walk(a.Content, "templates/"+a.Args.ResourceType, filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
 			return err
 		}
 
-		if err := a.collectEndpointPackageInfoForWiring("internal/endpoints"); err != nil {
+		if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
 			return err
 		}
 
-		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", a); err != nil {
+		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti); err != nil {
 			return err
 		}
 
@@ -85,32 +90,31 @@ func (a *Add) Execute(args []string) error {
 	return nil
 }
 
-func (a *Add) readModulePath() error {
+func readModulePath() (string, error) {
 	goMod := "go.mod"
 	if _, err := os.Stat(goMod); err == nil {
 		if goModFile, err := os.ReadFile(goMod); err != nil {
-			return fmt.Errorf("ReadFile %s: %s", goMod, err)
+			return "", fmt.Errorf("ReadFile %s: %s", goMod, err)
 		} else {
-			a.ModulePath = modfile.ModulePath(goModFile)
+			return modfile.ModulePath(goModFile), nil
 		}
 	} else {
-		return fmt.Errorf("stat: %w", err)
+		return "", fmt.Errorf("stat: %w", err)
 	}
-	return nil
 }
 
-func (a *Add) prepareResourceNames() {
-	pathBase := path.Base(a.Args.Path)
-	a.PathBase = pathBase
+func prepareResourceNames(args Arguments, ti *TemplateInput) {
+	pathBase := path.Base(args.Args.Path)
+	ti.PathBase = pathBase
 	pathBasePl := inflector.Pluralize(pathBase)
-	a.ResourceNamePlCaps = cases.Title(language.English).String(pathBasePl)
-	a.ResourceNamePlLower = strings.ToLower(pathBasePl)
+	ti.ResourceNamePlCaps = cases.Title(language.English).String(pathBasePl)
+	ti.ResourceNamePlLower = strings.ToLower(pathBasePl)
 	pathBaseSg := inflector.Singularize(pathBase)
-	a.ResourceNameSgCaps = cases.Title(language.English).String(pathBaseSg)
-	a.ResourceNameSgLower = strings.ToLower(pathBaseSg)
+	ti.ResourceNameSgCaps = cases.Title(language.English).String(pathBaseSg)
+	ti.ResourceNameSgLower = strings.ToLower(pathBaseSg)
 }
 
-func (a *Add) collectEndpointPackageInfoForWiring(root string) error {
+func collectEndpointPackageInfoForWiring(root string, ti *TemplateInput) error {
 	if err := filepath.Walk(root,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -131,7 +135,7 @@ func (a *Add) collectEndpointPackageInfoForWiring(root string) error {
 						for _, file := range pkg.Files {
 							for _, decl := range file.Decls {
 								if funcDecl, ok := decl.(*ast.FuncDecl); ok && funcDecl.Name.String() == WiringRouterFunctionName {
-									a.Packages = append(a.Packages, Package{
+									ti.Packages = append(ti.Packages, Package{
 										Name:    pkg.Name,
 										RelPath: path,
 									})
