@@ -20,6 +20,7 @@ import (
 )
 
 const RESTResource = "resource"
+const WSResource = "ws"
 const WiringRouterFunctionName = "ConfigureRouter"
 const WiringRouterFunctionContainingFile = "controller.go"
 
@@ -53,38 +54,46 @@ type TemplateInput struct {
 }
 
 func (a *Add) Execute(args []string) error {
+	if a.Args.Path == "" {
+		return fmt.Errorf("path uri is missing")
+	}
+
+	if !strings.HasPrefix(a.Args.Path, "/") {
+		a.Args.Path = "/" + a.Args.Path
+	}
+
+	ti := &TemplateInput{}
+	prepareResourceNames(a.Arguments, ti)
+	ti.RoutePath = a.Args.Path
+
+	if modPath, err := readModulePath(); err != nil {
+		return fmt.Errorf("readModulePath: %w", err)
+	} else {
+		ti.ModulePath = modPath
+	}
+
 	if a.Args.ResourceType == RESTResource {
-		if a.Args.Path == "" {
-			return fmt.Errorf("provide path for the REST resource")
-		}
-
-		if !strings.HasPrefix(a.Args.Path, "/") {
-			a.Args.Path = "/" + a.Args.Path
-		}
-
-		ti := &TemplateInput{}
-		prepareResourceNames(a.Arguments, ti)
-		if modPath, err := readModulePath(); err != nil {
-			return fmt.Errorf("readModulePath: %w", err)
-		} else {
-			ti.ModulePath = modPath
-		}
-		ti.RoutePath = a.Args.Path
-
 		if err := walk.Walk(a.Content, "templates/"+a.Args.ResourceType, filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
 			return err
 		}
-
-		if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
+	} else if a.Args.ResourceType == WSResource {
+		templateDir := "templates/" + a.Args.ResourceType
+		if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
 			return err
 		}
-
-		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti); err != nil {
+		if err := walk.Walk(a.Content, templateDir+"/internal", filepath.Clean("internal"), ti); err != nil {
 			return err
 		}
-
 	} else {
 		return fmt.Errorf("%s resource type not supported", a.Args.ResourceType)
+	}
+
+	if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
+		return err
+	}
+
+	if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti); err != nil {
+		return err
 	}
 
 	return nil
