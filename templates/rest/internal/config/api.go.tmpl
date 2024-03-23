@@ -24,7 +24,7 @@ func ConfigureFlags() []api.CommandLineOptionsGroup {
 		}*/}
 }
 
-func ConfigureAPI(a *api.API) {
+func configureGeneralAPI(a *api.API) {
 	a.Logger = log.Printf
 
 	a.PreServerShutdown = func() {}

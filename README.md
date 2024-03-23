@@ -23,12 +23,16 @@ kk init
 
 ### Add command
 Creates and wires a REST resource endpoint
-
 ```zsh
 kk add resource machines/data
 ```
 After adding a resource implement the endpoint business logic in `internal/endpoints/machines/data/provider.go` and `internal/endpoints/machines/data/model.go`.
 Paths may be different depending on the path given in the command arguments above.
+
+Creates and wires a websocket endpoint. It's based on Melody project (https://github.com/olahol/melody).
+```zsh
+kk add ws rest/ws
+```
 
 ## Example project
 kk generates projects like this https://github.com/waler4ik/kk-example (chi router, REST endpoints).
@@ -39,11 +43,11 @@ After running `kk init`, build and start your service with the commands below. T
 docker compose build && docker compose up -d
 ```
 ## Upcoming features (commands)
-- [ ] Add websocket command
+- [x] Add websocket command
+- [ ] Generate swagger/openapi specification command
 - [ ] Switch router command (e.g chi -> gorilla)
 - [ ] Add kubernetes scripts command
 - [ ] Add github scripts command
-- [ ] Generate swagger/openapi specification command
 
 ## Similar approaches 
 - https://github.com/hay-kot/scaffold It's a more general approach. It gives you the possibility to write and use your own templates.

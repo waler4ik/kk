@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/waler4ik/kk/internal/tmpl"
 	"github.com/waler4ik/kk/internal/walk"
 )
 
@@ -21,16 +22,18 @@ type Init struct {
 }
 
 type TemplateInput struct {
-	ModulePath string
-	Packages   []any //Dummy member in order to be able to process router.go.tmpl template, implement it later if necessary
+	tmpl.Root
 }
 
 func (i *Init) Execute(args []string) error {
 	if i.ProjectType == "rest" {
 		rootFolder := strings.ToLower(path.Base(i.ModulePath))
 		if err := walk.Walk(i.Content, "templates/"+i.ProjectType, rootFolder, &TemplateInput{
-			ModulePath: i.ModulePath,
-			Packages:   []any{},
+			Root: tmpl.Root{
+				ModulePath: i.ModulePath,
+				Packages:   []tmpl.Package{},
+				WSPackages: []tmpl.WSPackage{},
+			},
 		}); err != nil {
 			return err
 		}

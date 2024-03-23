@@ -2,6 +2,16 @@
 
 package api
 
-type generatedAPI struct {
-	//TODO add generated provider here
+{{if .WSPackages}}
+import (
+	"{{.ModulePath}}/internal/websocket"
+)
+{{end}}
+
+type GeneratedAPI struct {
+{{- if .WSPackages}}
+	{{- range .WSPackages}}
+	{{.NameCaps}} websocket.Websocket
+	{{- end }}
+{{- end}}
 }
