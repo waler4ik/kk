@@ -20,5 +20,10 @@ func ConfigureRouter(a *api.API) http.Handler {
 	{{.Name}}.ConfigureRouter(a, r)
   	{{- end }}
 
+{{- if .WSPackages}}
+	{{- range .WSPackages}}
+	r.HandleFunc({{.RoutePath}}, a.{{.NameCaps}}.Handler)
+	{{- end }}
+{{- end}}
 	return r
 }

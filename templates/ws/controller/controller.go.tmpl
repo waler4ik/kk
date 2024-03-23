@@ -16,7 +16,7 @@ type controller struct {
 	ch *connectionHandler
 }
 
-func NewController() websocket.Websocket {
+func NewWebsocket() websocket.Websocket {
 	m := melody.New()
 	ch := &connectionHandler{}
 	m.HandleConnect(ch.Connect)

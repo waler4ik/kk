@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/tangzero/inflector"
+	"github.com/waler4ik/kk/internal/tmpl"
 	"github.com/waler4ik/kk/internal/walk"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/text/cases"
@@ -23,6 +24,7 @@ const RESTResource = "resource"
 const WSResource = "ws"
 const WiringRouterFunctionName = "ConfigureRouter"
 const WiringRouterFunctionContainingFile = "controller.go"
+const WebsocketPathConstName = "WsPath"
 
 type Arguments struct {
 	Args struct {
@@ -37,20 +39,14 @@ type Add struct {
 	Content embed.FS
 }
 
-type Package struct {
-	Name    string
-	RelPath string
-}
-
 type TemplateInput struct {
-	ModulePath          string
+	tmpl.Root
 	PathBase            string
 	ResourceNameSgCaps  string //Singular caps e.g Machine
 	ResourceNameSgLower string //Singular lowercase e.g machine
 	ResourceNamePlCaps  string //Plural caps e.g Machines
 	ResourceNamePlLower string //Plural lowercase e.g machines
 	RoutePath           string
-	Packages            []Package
 }
 
 func (a *Add) Execute(args []string) error {
@@ -93,6 +89,10 @@ func (a *Add) Execute(args []string) error {
 	}
 
 	if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti); err != nil {
+		return err
+	}
+
+	if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", ti); err != nil {
 		return err
 	}
 
@@ -144,10 +144,33 @@ func collectEndpointPackageInfoForWiring(root string, ti *TemplateInput) error {
 						for _, file := range pkg.Files {
 							for _, decl := range file.Decls {
 								if funcDecl, ok := decl.(*ast.FuncDecl); ok && funcDecl.Name.String() == WiringRouterFunctionName {
-									ti.Packages = append(ti.Packages, Package{
+									ti.Packages = append(ti.Packages, tmpl.Package{
 										Name:    pkg.Name,
 										RelPath: path,
 									})
+									return nil
+								} else if genDecl, ok := decl.(*ast.GenDecl); ok && genDecl.Tok.String() == "const" {
+									for _, s := range genDecl.Specs {
+										if vs, ok := s.(*ast.ValueSpec); ok {
+											for _, name := range vs.Names {
+												if name.Name == WebsocketPathConstName {
+													for _, value := range vs.Values {
+														if bl, ok := value.(*ast.BasicLit); ok {
+															ti.WSPackages = append(ti.WSPackages, tmpl.WSPackage{
+																Package: tmpl.Package{
+																	Name:     pkg.Name,
+																	RelPath:  path,
+																	NameCaps: cases.Title(language.English).String(pkg.Name),
+																},
+																RoutePath: bl.Value,
+															})
+															return nil
+														}
+													}
+												}
+											}
+										}
+									}
 								}
 							}
 						}
