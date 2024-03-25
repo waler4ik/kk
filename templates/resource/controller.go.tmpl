@@ -106,7 +106,7 @@ func (c Controller) Update{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http
 
 func (c Controller) Delete{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http.Request) {
 	{{.ResourceNameSgLower}} := r.Context().Value({{.ResourceNameSgCaps}}CtxKey).(*{{.ResourceNameSgCaps}})
-	if err := c.p.Delete{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}.UUID.String()); err != nil {
+	if err := c.p.Delete{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}); err != nil {
 		render.Render(w, r, errors.ErrInternalServerError(err))
 		return
 	}

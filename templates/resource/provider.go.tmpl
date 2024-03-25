@@ -17,7 +17,9 @@ func NewProvider(a *api.API) Provider {
 
 // QueryParameter implements github.com/gorilla/schema
 type QueryParameter struct {
-	//SomeNiceQueryParameter         string `schema:"queryparametername,required"`
+	Name  string `schema:"name,required"`  // custom name, must be supplied
+    Phone string `schema:"phone"`          // custom name
+    Admin bool   `schema:"-"`              // this field is never set
 }
 
 func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParameter) ([]*{{.ResourceNameSgCaps}}, error) {
@@ -36,6 +38,6 @@ func (p Provider) Update{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.Resou
 	return fmt.Errorf("not implemented")
 }
 
-func (p Provider) Delete{{.ResourceNameSgCaps}}(ctx context.Context, id string) error {
+func (p Provider) Delete{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
 	return fmt.Errorf("not implemented")
 }
