@@ -3,6 +3,7 @@
 package {{.PathBase}}
 
 import (
+	"context"
 	"fmt"
 	"{{.ModulePath}}/internal/api"
 )
@@ -19,22 +20,22 @@ type QueryParameter struct {
 	//SomeNiceQueryParameter         string `schema:"queryparametername,required"`
 }
 
-func (p Provider) Get{{.ResourceNamePlCaps}}(qp QueryParameter) ([]*{{.ResourceNameSgCaps}}, error) {
+func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParameter) ([]*{{.ResourceNameSgCaps}}, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-func (p Provider) Get{{.ResourceNameSgCaps}}(id string) (*{{.ResourceNameSgCaps}}, error) {
+func (p Provider) Get{{.ResourceNameSgCaps}}(ctx context.Context, id string) (*{{.ResourceNameSgCaps}}, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-func (p Provider) Create{{.ResourceNameSgCaps}}(c *{{.ResourceNameSgCaps}}) error {
+func (p Provider) Create{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
 	return fmt.Errorf("not implemented")
 }
 
-func (p Provider) Update{{.ResourceNameSgCaps}}(c *{{.ResourceNameSgCaps}}) error {
+func (p Provider) Update{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
 	return fmt.Errorf("not implemented")
 }
 
-func (p Provider) Delete{{.ResourceNameSgCaps}}(id string) error {
+func (p Provider) Delete{{.ResourceNameSgCaps}}(ctx context.Context, id string) error {
 	return fmt.Errorf("not implemented")
 }
