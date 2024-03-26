@@ -52,7 +52,7 @@ func (c Controller) List{{.ResourceNamePlCaps}}(w http.ResponseWriter, r *http.R
 	}
 
 	forRendering := []render.Renderer{}
-	if {{.ResourceNamePlLower}}, err := c.p.Get{{.ResourceNamePlCaps}}(qp); err != nil {
+	if {{.ResourceNamePlLower}}, err := c.p.Get{{.ResourceNamePlCaps}}(r.Context(), qp); err != nil {
 		render.Render(w, r, errors.ErrInternalServerError(err))
 		return
 	} else {
@@ -73,7 +73,7 @@ func (c Controller) Create{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http
 		return
 	}
 
-	if err := c.p.Create{{.ResourceNameSgCaps}}({{.ResourceNameSgLower}}); err != nil {
+	if err := c.p.Create{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}); err != nil {
 		render.Render(w, r, errors.ErrInternalServerError(err))
 		return
 	}
@@ -98,7 +98,7 @@ func (c Controller) Update{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http
 		return
 	}
 
-	if err := c.p.Update{{.ResourceNameSgCaps}}({{.ResourceNameSgLower}}); err != nil {
+	if err := c.p.Update{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}); err != nil {
 		render.Render(w, r, errors.ErrInternalServerError(err))
 		return
 	}
@@ -106,7 +106,7 @@ func (c Controller) Update{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http
 
 func (c Controller) Delete{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http.Request) {
 	{{.ResourceNameSgLower}} := r.Context().Value({{.ResourceNameSgCaps}}CtxKey).(*{{.ResourceNameSgCaps}})
-	if err := c.p.Delete{{.ResourceNameSgCaps}}({{.ResourceNameSgLower}}.UUID.String()); err != nil {
+	if err := c.p.Delete{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}); err != nil {
 		render.Render(w, r, errors.ErrInternalServerError(err))
 		return
 	}
@@ -122,7 +122,7 @@ func (c Controller) {{.ResourceNameSgCaps}}Ctx(next http.Handler) http.Handler {
 		var err error
 
 		if {{.ResourceNameSgLower}}ID := chi.URLParam(r, "{{.ResourceNameSgLower}}ID"); {{.ResourceNameSgLower}}ID != "" {
-			{{.ResourceNameSgLower}}, err = c.p.Get{{.ResourceNameSgCaps}}({{.ResourceNameSgLower}}ID)
+			{{.ResourceNameSgLower}}, err = c.p.Get{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}ID)
 			if err != nil {
 				render.Render(w, r, errors.ErrNotFound)
 				return
