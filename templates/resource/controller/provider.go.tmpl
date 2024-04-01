@@ -5,6 +5,8 @@ package {{.PathBase}}
 import (
 	"context"
 	"fmt"
+
+	"github.com/go-chi/render"
 	"{{.ModulePath}}/internal/api"
 )
 
@@ -22,7 +24,7 @@ type QueryParameter struct {
     Admin bool   `schema:"-"`              // this field is never set
 }
 
-func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParameter) ([]*{{.ResourceNameSgCaps}}, error) {
+func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParameter) ([]render.Renderer, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 

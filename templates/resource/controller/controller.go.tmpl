@@ -51,15 +51,11 @@ func (c Controller) List{{.ResourceNamePlCaps}}(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	forRendering := []render.Renderer{}
 	if {{.ResourceNamePlLower}}, err := c.p.Get{{.ResourceNamePlCaps}}(r.Context(), qp); err != nil {
 		render.Render(w, r, errors.ErrInternalServerError(err))
 		return
 	} else {
-		for _, c := range {{.ResourceNamePlLower}} {
-			forRendering = append(forRendering, c)
-		}
-		if err := render.RenderList(w, r, forRendering); err != nil {
+		if err := render.RenderList(w, r, {{.ResourceNamePlLower}}); err != nil {
 			render.Render(w, r, errors.ErrRender(err))
 			return
 		}
