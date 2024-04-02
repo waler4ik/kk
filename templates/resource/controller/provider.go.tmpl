@@ -24,22 +24,89 @@ type QueryParameter struct {
     Admin bool   `schema:"-"`              // this field is never set
 }
 
+// Get{{.ResourceNamePlCaps}} godoc
+//
+//	@Summary		List {{.ResourceNamePlLower}}
+//	@Description	get {{.ResourceNamePlLower}}
+//	@Tags			{{.ResourceNamePlLower}}
+//	@Accept			json
+//	@Produce		json
+//	@Param			name	query		string	true	"name attribute in query"
+//	@Param			phone	query		string	false	"phone attribute in query"
+//	@Success		200	{array}		{{.PathBase}}.{{.ResourceNameSgCaps}}
+//	@Failure		400	{object}	errors.ErrResponse
+//	@Failure		404	{object}	errors.ErrResponse
+//	@Failure		500	{object}	errors.ErrResponse
+//	@Router			{{.RoutePath}} [get]
 func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParameter) ([]render.Renderer, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
+// Get{{.ResourceNameSgCaps}} godoc
+//
+//	@Summary		Show {{.ResourceNameSgLower}}
+//	@Description	get {{.ResourceNameSgCaps}} by ID
+//	@Tags			{{.ResourceNamePlLower}}
+//	@Accept			json
+//	@Produce		json
+//	@Param			{{.ResourceNameSgLower}}ID	path		string	true	"{{.ResourceNameSgCaps}} ID"
+//	@Success		200	{object}	{{.PathBase}}.{{.ResourceNameSgCaps}}
+//	@Failure		400	{object}	errors.ErrResponse
+//	@Failure		404	{object}	errors.ErrResponse
+//	@Failure		500	{object}	errors.ErrResponse
+//	@Router			{{.RoutePath}}/{ {{- .ResourceNameSgLower}}ID} [get]
 func (p Provider) Get{{.ResourceNameSgCaps}}(ctx context.Context, id string) (*{{.ResourceNameSgCaps}}, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-func (p Provider) Create{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
-	return fmt.Errorf("not implemented")
+// Create{{.ResourceNameSgCaps}} godoc
+//
+//	@Summary		Add {{.ResourceNameSgLower}}
+//	@Description	add by json {{.ResourceNameSgLower}}
+//	@Tags			{{.ResourceNamePlLower}}
+//	@Accept			json
+//	@Produce		json
+//	@Param			{{.ResourceNameSgLower}}	body		{{.PathBase}}.{{.ResourceNameSgCaps}}	true	"Add {{.ResourceNameSgLower}}"
+//	@Success		201		{object}	{{.PathBase}}.{{.ResourceNameSgCaps}}
+//	@Failure		400		{object}	errors.ErrResponse
+//	@Failure		404		{object}	errors.ErrResponse
+//	@Failure		500		{object}	errors.ErrResponse
+//	@Router			{{.RoutePath}} [post]
+func (p Provider) Create{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) (*{{.ResourceNameSgCaps}}, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
+// Update{{.ResourceNameSgCaps}} godoc
+//
+//	@Summary		Update {{.ResourceNameSgLower}}
+//	@Description	Update by json {{.ResourceNameSgLower}}
+//	@Tags			{{.ResourceNamePlLower}}
+//	@Accept			json
+//	@Produce		json
+//	@Param			{{.ResourceNameSgLower}}ID	path		string	true	"{{.ResourceNameSgCaps}} ID"
+//	@Param			{{.ResourceNameSgLower}}	body		{{.PathBase}}.{{.ResourceNameSgCaps}}	true	"Update {{.ResourceNameSgLower}}"
+//	@Success		200
+//	@Failure		400		{object}	errors.ErrResponse
+//	@Failure		404		{object}	errors.ErrResponse
+//	@Failure		500		{object}	errors.ErrResponse
+//	@Router			{{.RoutePath}}/{ {{- .ResourceNameSgLower}}ID} [put]
 func (p Provider) Update{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
 	return fmt.Errorf("not implemented")
 }
 
+// Delete{{.ResourceNameSgCaps}} godoc
+//
+//	@Summary		Delete {{.ResourceNameSgLower}}
+//	@Description	Delete by {{.ResourceNameSgLower}} ID
+//	@Tags			{{.ResourceNamePlLower}}
+//	@Accept			json
+//	@Produce		json
+//	@Param			{{.ResourceNameSgLower}}ID	path		string	true	"{{.ResourceNameSgCaps}} ID"
+//	@Success		200
+//	@Failure		400	{object}	errors.ErrResponse
+//	@Failure		404	{object}	errors.ErrResponse
+//	@Failure		500	{object}	errors.ErrResponse
+//	@Router			{{.RoutePath}}/{ {{- .ResourceNameSgLower}}ID} [delete]
 func (p Provider) Delete{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
 	return fmt.Errorf("not implemented")
 }

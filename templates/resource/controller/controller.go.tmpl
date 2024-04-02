@@ -69,13 +69,13 @@ func (c Controller) Create{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http
 		return
 	}
 
-	if err := c.p.Create{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}); err != nil {
+	if {{.ResourceNameSgLower}}, err := c.p.Create{{.ResourceNameSgCaps}}(r.Context(), {{.ResourceNameSgLower}}); err != nil {
 		render.Render(w, r, errors.ErrInternalServerError(err))
 		return
+	} else {
+		render.Status(r, http.StatusCreated)
+		render.Render(w, r, {{.ResourceNameSgLower}})
 	}
-
-	render.Status(r, http.StatusCreated)
-	render.Render(w, r, {{.ResourceNameSgLower}})
 }
 
 func (c Controller) Get{{.ResourceNameSgCaps}}(w http.ResponseWriter, r *http.Request) {
