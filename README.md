@@ -52,7 +52,7 @@ docker compose build && docker compose up -d
 ## Upcoming features (commands)
 - [x] Add websocket command
 - [x] Generate swagger/openapi specification command
-- [ ] Switch router command (e.g chi -> gorilla)
+- [ ] Select router within init command (chi, gin, gorilla)
 - [ ] Add kubernetes scripts command
 - [ ] Add github scripts command
 
