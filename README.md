@@ -35,11 +35,11 @@ kk add ws rest/ws
 ```
 
 ## OpenAPI / Swagger interface
-REST resource endpoints added with `kk add` come along with [swaggo/swag](https://github.com/swaggo/swag) annotations.
+REST resource endpoints added with `kk add` come along with [swaggo/swag](https://github.com/swaggo/swag) annotations. So you can tell the world how your REST webservice works.
 
 Possible workflow:
 - Generate swagger 2.0 specification with [swaggo/swag](https://github.com/swaggo/swag). Run `swag init -g internal/docs/docs.go`.
-- Generate a Golang client from previously generated swagger 2.0 specification with [go-swagger](https://github.com/go-swagger/go-swagger).
+- Generate a Golang client from previously generated swagger 2.0 specification with [go-swagger](https://github.com/go-swagger/go-swagger) and use it for your Golang client application or just test your previously generated webservice.
 
 ## Example project
 kk generates projects like this https://github.com/waler4ik/kk-example (chi router, REST endpoints).
