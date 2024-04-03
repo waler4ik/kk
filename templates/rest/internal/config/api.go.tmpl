@@ -24,10 +24,7 @@ func ConfigureFlags() []api.CommandLineOptionsGroup {
 		}*/}
 }
 
-func configureGeneralAPI(a *api.API) {
-	a.Logger = log.Printf
+// configureExtendedAPI is an entry point for the extended api configuration. It's also possible to modify the generated configuration.
+func configureExtendedAPI(a *api.API) {
 
-	a.PreServerShutdown = func() {}
-
-	a.ServerShutdown = func() {}
 }

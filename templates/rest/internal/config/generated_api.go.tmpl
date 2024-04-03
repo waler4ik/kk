@@ -12,11 +12,14 @@ import (
 )
 
 func ConfigureAPI(a *api.API) {
-	configureGeneratedAPI(&a.GeneratedAPI)
-	configureGeneralAPI(a)
+	configureGeneratedAPI(a)
+	configureExtendedAPI(a)
 }
 
-func configureGeneratedAPI(a *api.GeneratedAPI) {
+func configureGeneratedAPI(a *api.API) {
+	a.Logger = log.Printf
+	a.PreServerShutdown = func() {}
+	a.ServerShutdown = func() {}
 {{- if .WSPackages}}
 	//websockets
 	{{- range .WSPackages}}

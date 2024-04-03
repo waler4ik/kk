@@ -2,11 +2,14 @@
 
 package api
 
+{{if .WSPackages}}
+import (
+	"{{.ModulePath}}/internal/websocket"
+)
+{{end}}
+
 func NewAPI() *API {
-	return &API{
-		PreServerShutdown: func() {},
-		ServerShutdown:    func() {},
-	}
+	return &API{}
 }
 
 // CommandLineOptionsGroup represents a group of user-defined command line options
@@ -17,7 +20,7 @@ type CommandLineOptionsGroup struct {
 }
 
 type API struct {
-	GeneratedAPI
+	ExtendedAPI
 	// PreServerShutdown is called before the HTTP(S) server is shutdown
 	// This allows for custom functions to get executed before the HTTP(S) server stops accepting traffic
 	PreServerShutdown func()
@@ -31,4 +34,10 @@ type API struct {
 
 	// User defined logger function.
 	Logger func(string, ...interface{})
+
+{{- if .WSPackages}}
+	{{- range .WSPackages}}
+	{{.NameCaps}} websocket.Websocket // WS path: {{.RoutePath}}
+	{{- end }}
+{{- end}}
 }
