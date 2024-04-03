@@ -2,17 +2,13 @@
 
 package api
 
-{{if .WSPackages}}
-import (
-	"{{.ModulePath}}/internal/websocket"
-)
-{{end}}
-
 func NewAPI() *API {
 	return &API{}
 }
 
 type API struct {
+	Websockets
+	Provider
 	ExtendedAPI
 
 	// PreServerShutdown is called before the HTTP(S) server is shutdown
@@ -25,10 +21,4 @@ type API struct {
 
 	// User defined logger function.
 	Logger func(string, ...interface{})
-
-{{- if .WSPackages}}
-	{{- range .WSPackages}}
-	{{.NameCaps}} websocket.Websocket // WS path: {{.RoutePath}}
-	{{- end }}
-{{- end}}
 }

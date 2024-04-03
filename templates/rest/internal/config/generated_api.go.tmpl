@@ -6,15 +6,11 @@ import (
 	"log"
 
 	"{{.ModulePath}}/internal/api"
-{{- if .WSPackages}}
-	{{- range .WSPackages}}
-	"{{$.ModulePath}}/{{.RelPath}}"
-	{{- end }}
-{{- end}}
 )
 
 func ConfigureAPI(a *api.API) {
 	configureGeneratedAPI(a)
+	configureWebsockets(a)
 	configureExtendedAPI(a)
 }
 
@@ -22,10 +18,4 @@ func configureGeneratedAPI(a *api.API) {
 	a.Logger = log.Printf
 	a.PreServerShutdown = func() {}
 	a.ServerShutdown = func() {}
-{{- if .WSPackages}}
-	//websockets
-	{{- range .WSPackages}}
-	a.{{.NameCaps}} = {{.Name}}.NewWebsocket()
-	{{- end }}
-{{- end}}
 }

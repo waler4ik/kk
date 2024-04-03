@@ -68,30 +68,32 @@ func (a *Add) Execute(args []string) error {
 		ti.ModulePath = modPath
 	}
 
-	if a.Args.ResourceType != RESTResource && a.Args.ResourceType != WSResource {
+	if a.Args.ResourceType == RESTResource || a.Args.ResourceType == WSResource {
+		templateDir := "templates/" + a.Args.ResourceType
+
+		if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
+			return err
+		}
+		if err := walk.Walk(a.Content, templateDir+"/internal", filepath.Clean("internal"), ti); err != nil {
+			return err
+		}
+		if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti,
+			"templates/rest/internal/config/router.go.tmpl",
+			"templates/rest/internal/config/websockets.go.tmpl"); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", ti,
+			"templates/rest/internal/api/websockets.go.tmpl"); err != nil {
+			return err
+		}
+	} else {
 		return fmt.Errorf("%s resource type not supported", a.Args.ResourceType)
 	}
-
-	templateDir := "templates/" + a.Args.ResourceType
-
-	if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
-		return err
-	}
-	if err := walk.Walk(a.Content, templateDir+"/internal", filepath.Clean("internal"), ti); err != nil {
-		return err
-	}
-	if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
-		return err
-	}
-
-	if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti); err != nil {
-		return err
-	}
-
-	if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", ti); err != nil {
-		return err
-	}
-
 	return nil
 }
 
