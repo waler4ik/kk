@@ -27,10 +27,6 @@ func (s *Server) ConfigureAPI() {
 	s.handler = config.ConfigureRouter(s.api)
 }
 
-func (s *Server) ConfigureAPIFlags() {
-	s.api.CommandLineOptionsGroups = config.ConfigureFlags()
-}
-
 type Server struct {
 	CleanupTimeout  time.Duration `long:"cleanup-timeout" description:"grace period for which to wait before killing idle connections" default:"10s"`
 	GracefulTimeout time.Duration `long:"graceful-timeout" description:"grace period for which to wait before shutting down the server" default:"15s"`

@@ -12,15 +12,9 @@ func NewAPI() *API {
 	return &API{}
 }
 
-// CommandLineOptionsGroup represents a group of user-defined command line options
-type CommandLineOptionsGroup struct {
-	ShortDescription string
-	LongDescription  string
-	Options          interface{}
-}
-
 type API struct {
 	ExtendedAPI
+
 	// PreServerShutdown is called before the HTTP(S) server is shutdown
 	// This allows for custom functions to get executed before the HTTP(S) server stops accepting traffic
 	PreServerShutdown func()
@@ -28,9 +22,6 @@ type API struct {
 	// ServerShutdown is called when the HTTP(S) server is shut down and done
 	// handling all active connections and does not accept connections any more
 	ServerShutdown func()
-
-	// Custom command line argument groups with their descriptions
-	CommandLineOptionsGroups []CommandLineOptionsGroup
 
 	// User defined logger function.
 	Logger func(string, ...interface{})

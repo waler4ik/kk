@@ -3,26 +3,8 @@
 package config
 
 import (
-	"log"
-
 	"{{.ModulePath}}/internal/api"
 )
-
-/*
-	var dbConfig = struct {
-		Name     string `long:"db.name" default:"postgres" env:"DB_NAME" description:""`
-		User     string `long:"db.user" default:"postgres" env:"DB_USER" description:""`
-		Password string `long:"db.pwd" default:"example" env:"DB_PWD" description:""`
-		Address  string `long:"db.address" default:"db:5432" env:"DB_ADDRESS" description:""`
-	}{}
-*/
-func ConfigureFlags() []api.CommandLineOptionsGroup {
-	return []api.CommandLineOptionsGroup{ /*{
-			LongDescription:  "Postgres Database options",
-			ShortDescription: "Postgres",
-			Options:          &dbConfig,
-		}*/}
-}
 
 // configureExtendedAPI is an entry point for the extended api configuration. It's also possible to modify the generated configuration.
 func configureExtendedAPI(a *api.API) {

@@ -3,6 +3,8 @@
 package config
 
 import (
+	"log"
+
 	"{{.ModulePath}}/internal/api"
 {{- if .WSPackages}}
 	{{- range .WSPackages}}
