@@ -3,12 +3,17 @@
 package config
 
 import (
+	"fmt"
+
 	"{{.ModulePath}}/internal/api"
 )
 
-func ConfigureAPI(a *api.API) {
+func ConfigureAPI(a *api.API) error {
 	configureBasicAPI(&a.Basic)
-	configureProvider(&a.Provider)
+	if err := configureProvider(a.Logger, &a.Provider); err != nil {
+		return fmt.Errorf("configureProvider: %w", err)
+	}
 	configureWebsockets(&a.Websockets)
 	configureUserManagedAPI(&a.UserManagedAPI)
+	return nil
 }

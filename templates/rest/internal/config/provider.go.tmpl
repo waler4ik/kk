@@ -6,5 +6,7 @@ import (
 	"{{.ModulePath}}/internal/api"
 )
 
-func configureProvider(a *api.Provider) {
+func configureProvider(logger func(string, ...any), a *api.Provider) error {
+	return nil
 }
+
