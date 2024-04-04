@@ -11,7 +11,7 @@ import (
 {{- end}}
 )
 
-func configureWebsockets(a *api.API) {
+func configureWebsockets(a *api.Websockets) {
 {{- if .WSPackages}}
 	//websockets
 	{{- range .WSPackages}}
