@@ -26,8 +26,6 @@ Creates and wires a REST resource endpoint
 ```zsh
 kk add resource machines/data
 ```
-After adding a resource implement the endpoint business logic in `internal/endpoints/machines/data/provider.go` and `internal/endpoints/machines/data/model.go`.
-Paths may be different depending on the path given in the command arguments above.
 
 Creates and wires a websocket endpoint. It's based on Melody project (https://github.com/olahol/melody).
 ```zsh
