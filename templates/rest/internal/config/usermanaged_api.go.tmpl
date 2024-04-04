@@ -7,5 +7,6 @@ import (
 )
 
 // configureUserManagedAPI is an entry point for the user managed api configuration part.
-func configureUserManagedAPI(a *api.UserManagedAPI) {
+func configureUserManagedAPI(logger func(string, ...any), a *api.UserManagedAPI) error {
+	return nil
 }

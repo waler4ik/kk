@@ -10,10 +10,9 @@ import (
 
 func ConfigureAPI(a *api.API) error {
 	configureBasicAPI(&a.Basic)
-	if err := configureProvider(a.Logger, &a.Provider); err != nil {
-		return fmt.Errorf("configureProvider: %w", err)
-	}
 	configureWebsockets(&a.Websockets)
-	configureUserManagedAPI(&a.UserManagedAPI)
+	if err := configureUserManagedAPI(a.Logger, &a.UserManagedAPI); err != nil {
+		return fmt.Errorf("configureUserManagedAPI: %w", err)
+	}
 	return nil
 }
