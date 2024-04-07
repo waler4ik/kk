@@ -11,12 +11,7 @@ import (
 {{- end}}
 )
 
-func ConfigureAPI(a *api.API) {
-	configureGeneratedAPI(&a.GeneratedAPI)
-	configureGeneralAPI(a)
-}
-
-func configureGeneratedAPI(a *api.GeneratedAPI) {
+func configureWebsockets(a *api.Websockets) {
 {{- if .WSPackages}}
 	//websockets
 	{{- range .WSPackages}}

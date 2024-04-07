@@ -4,6 +4,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -22,13 +23,12 @@ func NewServer(api *api.API) *Server {
 	return &Server{api: api}
 }
 
-func (s *Server) ConfigureAPI() {
-	config.ConfigureAPI(s.api)
+func (s *Server) ConfigureAPI() error {
+	if err := config.ConfigureAPI(s.api); err != nil {
+		return fmt.Errorf("configure api: %w", err)
+	}
 	s.handler = config.ConfigureRouter(s.api)
-}
-
-func (s *Server) ConfigureAPIFlags() {
-	s.api.CommandLineOptionsGroups = config.ConfigureFlags()
+	return nil
 }
 
 type Server struct {

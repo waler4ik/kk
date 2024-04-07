@@ -22,6 +22,8 @@ import (
 
 const RESTResource = "resource"
 const WSResource = "ws"
+const EnvSecretManager = "envsecretmanager"
+const Postgres = "postgres"
 const WiringRouterFunctionName = "ConfigureRouter"
 const WiringRouterFunctionContainingFile = "controller.go"
 const WebsocketPathConstName = "WsPath"
@@ -50,17 +52,8 @@ type TemplateInput struct {
 }
 
 func (a *Add) Execute(args []string) error {
-	if a.Args.Path == "" {
-		return fmt.Errorf("path uri is missing")
-	}
-
-	if !strings.HasPrefix(a.Args.Path, "/") {
-		a.Args.Path = "/" + a.Args.Path
-	}
 
 	ti := &TemplateInput{}
-	prepareResourceNames(a.Arguments, ti)
-	ti.RoutePath = a.Args.Path
 
 	if modPath, err := readModulePath(); err != nil {
 		return fmt.Errorf("readModulePath: %w", err)
@@ -68,30 +61,48 @@ func (a *Add) Execute(args []string) error {
 		ti.ModulePath = modPath
 	}
 
-	if a.Args.ResourceType != RESTResource && a.Args.ResourceType != WSResource {
-		return fmt.Errorf("%s resource type not supported", a.Args.ResourceType)
-	}
-
 	templateDir := "templates/" + a.Args.ResourceType
 
-	if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
-		return err
-	}
-	if err := walk.Walk(a.Content, templateDir+"/internal", filepath.Clean("internal"), ti); err != nil {
-		return err
-	}
-	if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
-		return err
-	}
+	if a.Args.ResourceType == RESTResource || a.Args.ResourceType == WSResource {
+		if a.Args.Path == "" {
+			return fmt.Errorf("path uri is missing")
+		}
 
-	if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti); err != nil {
-		return err
-	}
+		if !strings.HasPrefix(a.Args.Path, "/") {
+			a.Args.Path = "/" + a.Args.Path
+		}
 
-	if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", ti); err != nil {
-		return err
-	}
+		prepareResourceNames(a.Args.Path, ti)
 
+		ti.RoutePath = a.Args.Path
+
+		if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
+			return err
+		}
+		if err := walk.Walk(a.Content, templateDir+"/internal", "internal", ti); err != nil {
+			return err
+		}
+		if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti,
+			"templates/rest/internal/config/router.go.tmpl",
+			"templates/rest/internal/config/websockets.go.tmpl"); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", ti,
+			"templates/rest/internal/api/websockets.go.tmpl"); err != nil {
+			return err
+		}
+	} else if a.Args.ResourceType == EnvSecretManager || a.Args.ResourceType == Postgres {
+		if err := walk.Walk(a.Content, templateDir, "./", ti); err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("%s resource type not supported", a.Args.ResourceType)
+	}
 	return nil
 }
 
@@ -108,8 +119,8 @@ func readModulePath() (string, error) {
 	}
 }
 
-func prepareResourceNames(args Arguments, ti *TemplateInput) {
-	pathBase := path.Base(args.Args.Path)
+func prepareResourceNames(resourcePath string, ti *TemplateInput) {
+	pathBase := path.Base(resourcePath)
 	ti.PathBase = pathBase
 	pathBasePl := inflector.Pluralize(pathBase)
 	ti.ResourceNamePlCaps = cases.Title(language.English).String(pathBasePl)
