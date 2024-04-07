@@ -32,6 +32,16 @@ Creates and wires a websocket endpoint. It's based on Melody project (https://gi
 kk add ws rest/ws
 ```
 
+Adds a postgres provider.
+```zsh
+kk add postgres
+```
+
+Adds a secret manager provider based on environment variables.
+```zsh
+kk add envsecretmanager
+```
+
 ## OpenAPI / Swagger interface
 REST resource endpoints added with `kk add` come along with [swaggo/swag](https://github.com/swaggo/swag) annotations. So you can tell the world how your REST webservice works.
 
