@@ -9,5 +9,6 @@ func NewAPI() *API {
 type API struct {
 	Basic
 	Websockets
+	Provider
 	UserManagedAPI
 }

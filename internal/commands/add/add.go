@@ -2,6 +2,7 @@ package add
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -25,6 +26,8 @@ const WSResource = "ws"
 const EnvSecretManager = "envsecretmanager"
 const Postgres = "postgres"
 const WiringRouterFunctionName = "ConfigureRouter"
+const NewFunctionName = "New"
+const SecretFunctionName = "Secret"
 const WiringRouterFunctionContainingFile = "controller.go"
 const WebsocketPathConstName = "WsPath"
 
@@ -41,7 +44,7 @@ type Add struct {
 	Content embed.FS
 }
 
-type TemplateInput struct {
+type ResourceTemplateInput struct {
 	tmpl.Root
 	PathBase            string
 	ResourceNameSgCaps  string //Singular caps e.g Machine
@@ -51,14 +54,14 @@ type TemplateInput struct {
 	RoutePath           string
 }
 
+type ProviderTemplateInput struct {
+	tmpl.Root
+}
+
 func (a *Add) Execute(args []string) error {
-
-	ti := &TemplateInput{}
-
-	if modPath, err := readModulePath(); err != nil {
+	modPath, err := readModulePath()
+	if err != nil {
 		return fmt.Errorf("readModulePath: %w", err)
-	} else {
-		ti.ModulePath = modPath
 	}
 
 	templateDir := "templates/" + a.Args.ResourceType
@@ -71,6 +74,9 @@ func (a *Add) Execute(args []string) error {
 		if !strings.HasPrefix(a.Args.Path, "/") {
 			a.Args.Path = "/" + a.Args.Path
 		}
+		ti := &ResourceTemplateInput{}
+
+		ti.ModulePath = modPath
 
 		prepareResourceNames(a.Args.Path, ti)
 
@@ -96,8 +102,75 @@ func (a *Add) Execute(args []string) error {
 			"templates/rest/internal/api/websockets.go.tmpl"); err != nil {
 			return err
 		}
-	} else if a.Args.ResourceType == EnvSecretManager || a.Args.ResourceType == Postgres {
-		if err := walk.Walk(a.Content, templateDir, "./", ti); err != nil {
+	} else if a.Args.ResourceType == EnvSecretManager {
+		pti := &ProviderTemplateInput{}
+		pti.ModulePath = modPath
+
+		if _, err := os.Stat("internal/provider"); err == nil {
+			if err := collectSecretManagerInfoForWiring("internal/provider", pti); err != nil {
+				return err
+			}
+		} else if !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("stat: %w", err)
+		}
+
+		if len(pti.SecretManagers) > 0 {
+			return fmt.Errorf("you already have a secret manager, try to delete it first and then rerun the add command")
+		}
+
+		if err := walk.Walk(a.Content, templateDir, "./", pti); err != nil {
+			return err
+		}
+
+		if err := collectSecretManagerInfoForWiring("internal/provider", pti); err != nil {
+			return err
+		}
+		if err := collectProviderInfoForWiring("internal/provider", pti); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", pti,
+			"templates/rest/internal/api/provider.go.tmpl"); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", pti,
+			"templates/rest/internal/config/provider.go.tmpl"); err != nil {
+			return err
+		}
+	} else if a.Args.ResourceType == Postgres {
+		pti := &ProviderTemplateInput{}
+		pti.ModulePath = modPath
+
+		if _, err := os.Stat("internal/provider"); err == nil {
+			if err := collectSecretManagerInfoForWiring("internal/provider", pti); err != nil {
+				return err
+			}
+		} else if !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("stat: %w", err)
+		}
+		smCount := len(pti.SecretManagers)
+		if smCount == 0 {
+			return fmt.Errorf("add a secret manager first e.g kk add envsecretmanager")
+		} else if smCount > 1 {
+			return fmt.Errorf("more than one secret manager found under providers, please choose only one")
+		}
+
+		if err := walk.Walk(a.Content, templateDir, "./", pti); err != nil {
+			return err
+		}
+
+		if err := collectProviderInfoForWiring("internal/provider", pti); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", pti,
+			"templates/rest/internal/api/provider.go.tmpl"); err != nil {
+			return err
+		}
+
+		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", pti,
+			"templates/rest/internal/config/provider.go.tmpl"); err != nil {
 			return err
 		}
 	} else {
@@ -119,7 +192,7 @@ func readModulePath() (string, error) {
 	}
 }
 
-func prepareResourceNames(resourcePath string, ti *TemplateInput) {
+func prepareResourceNames(resourcePath string, ti *ResourceTemplateInput) {
 	pathBase := path.Base(resourcePath)
 	ti.PathBase = pathBase
 	pathBasePl := inflector.Pluralize(pathBase)
@@ -130,7 +203,7 @@ func prepareResourceNames(resourcePath string, ti *TemplateInput) {
 	ti.ResourceNameSgLower = strings.ToLower(pathBaseSg)
 }
 
-func collectEndpointPackageInfoForWiring(root string, ti *TemplateInput) error {
+func collectEndpointPackageInfoForWiring(root string, ti *ResourceTemplateInput) error {
 	if err := filepath.Walk(root,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -165,11 +238,11 @@ func collectEndpointPackageInfoForWiring(root string, ti *TemplateInput) error {
 														if bl, ok := value.(*ast.BasicLit); ok {
 															ti.WSPackages = append(ti.WSPackages, tmpl.WSPackage{
 																Package: tmpl.Package{
-																	Name:     pkg.Name,
-																	RelPath:  path,
-																	NameCaps: cases.Title(language.English).String(pkg.Name),
+																	Name:    pkg.Name,
+																	RelPath: path,
 																},
 																RoutePath: bl.Value,
+																NameCaps:  cases.Title(language.English).String(pkg.Name),
 															})
 															return nil
 														}
@@ -180,6 +253,171 @@ func collectEndpointPackageInfoForWiring(root string, ti *TemplateInput) error {
 									}
 								}
 							}
+						}
+					}
+				}
+			}
+			return nil
+		}); err != nil {
+		return fmt.Errorf("filepath walk: %w", err)
+	}
+	return nil
+}
+
+func collectProviderInfoForWiring(root string, pti *ProviderTemplateInput) error {
+	if err := filepath.Walk(root,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			fset := token.NewFileSet()
+
+			if info.IsDir() {
+				if pkgMap, err := parser.ParseDir(fset, path,
+					func(fi fs.FileInfo) bool {
+						return strings.HasSuffix(fi.Name(), ".go")
+					},
+					0); err != nil {
+					return fmt.Errorf("ParseDir: %w", err)
+				} else {
+					for _, pkg := range pkgMap {
+						for _, file := range pkg.Files {
+							for _, decl := range file.Decls {
+								if funcDecl, ok := decl.(*ast.FuncDecl); ok && funcDecl.Name.String() == NewFunctionName && funcDecl.Type != nil {
+									ft := funcDecl.Type
+									if ft.Func != token.NoPos && ft.Params != nil && len(ft.Params.List) == 2 {
+										hasLoggerParam := false
+										hasSecretManagerParam := false
+										if pf, ok := ft.Params.List[0].Type.(*ast.FuncType); ok && pf.Params != nil && len(pf.Params.List) == 2 {
+											firstParamType, okFirst := pf.Params.List[0].Type.(*ast.Ident)
+											var secondParamType *ast.Ident
+											var okSecond bool
+											if elli, ok := pf.Params.List[1].Type.(*ast.Ellipsis); ok {
+												secondParamType, okSecond = elli.Elt.(*ast.Ident)
+											}
+
+											if okFirst && okSecond && firstParamType.Name == "string" && secondParamType.Name == "any" {
+												hasLoggerParam = true
+											}
+										} else {
+											continue
+										}
+
+										if se, ok := ft.Params.List[1].Type.(*ast.SelectorExpr); ok {
+											if se.Sel != nil && se.Sel.Name == "SecretManager" {
+												if id, ok := se.X.(*ast.Ident); ok && id.Name == "secretmanager" {
+													hasSecretManagerParam = true
+												}
+											}
+										} else {
+											continue
+										}
+
+										if hasLoggerParam && hasSecretManagerParam {
+											if ft.Results != nil && len(ft.Results.List) == 2 {
+												var firstReturnTypeName, secondReturnTypeName string
+												if sx, ok := ft.Results.List[0].Type.(*ast.StarExpr); ok {
+													if rt, ok := sx.X.(*ast.Ident); ok {
+														firstReturnTypeName = rt.Name
+													}
+												}
+												if sx, ok := ft.Results.List[1].Type.(*ast.Ident); ok {
+													secondReturnTypeName = sx.Name
+												}
+												if firstReturnTypeName != "" && secondReturnTypeName == "error" {
+													pti.ProviderStructs = append(pti.ProviderStructs, tmpl.StructInfo{
+														Package: tmpl.Package{
+															Name:    pkg.Name,
+															RelPath: path,
+														},
+														StructName: firstReturnTypeName,
+													})
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			return nil
+		}); err != nil {
+		return fmt.Errorf("filepath walk: %w", err)
+	}
+	return nil
+}
+
+func collectSecretManagerInfoForWiring(root string, pti *ProviderTemplateInput) error {
+	if err := filepath.Walk(root,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			fset := token.NewFileSet()
+
+			if info.IsDir() {
+				if pkgMap, err := parser.ParseDir(fset, path,
+					func(fi fs.FileInfo) bool {
+						return strings.HasSuffix(fi.Name(), ".go")
+					},
+					0); err != nil {
+					return fmt.Errorf("ParseDir: %w", err)
+				} else {
+					for _, pkg := range pkgMap {
+						var structInfo tmpl.StructInfo
+						foundSecretMethod := false
+						for _, file := range pkg.Files {
+							for _, decl := range file.Decls {
+								if funcDecl, ok := decl.(*ast.FuncDecl); ok && funcDecl.Type != nil {
+									ft := funcDecl.Type
+									if funcDecl.Name.String() == NewFunctionName {
+										if ft.Func != token.NoPos && ft.Params != nil || len(ft.Params.List) == 1 {
+											if pf, ok := ft.Params.List[0].Type.(*ast.FuncType); ok && pf.Params != nil && len(pf.Params.List) == 2 {
+												firstParamType, okFirst := pf.Params.List[0].Type.(*ast.Ident)
+												var secondParamType *ast.Ident
+												var okSecond bool
+												if elli, ok := pf.Params.List[1].Type.(*ast.Ellipsis); ok {
+													secondParamType, okSecond = elli.Elt.(*ast.Ident)
+												}
+
+												if okFirst && okSecond && firstParamType.Name == "string" && secondParamType.Name == "any" {
+													if ft.Results != nil && len(ft.Results.List) > 0 {
+														if sx, ok := ft.Results.List[0].Type.(*ast.StarExpr); ok {
+															if rt, ok := sx.X.(*ast.Ident); ok {
+																structInfo = tmpl.StructInfo{
+																	Package: tmpl.Package{
+																		Name:    pkg.Name,
+																		RelPath: path,
+																	},
+																	StructName: rt.Name,
+																}
+															}
+														}
+
+													}
+												}
+											} else {
+												continue
+											}
+										}
+									} else if funcDecl.Name.String() == SecretFunctionName && funcDecl.Recv != nil {
+										for _, receiver := range funcDecl.Recv.List {
+											if sx, ok := receiver.Type.(*ast.StarExpr); ok {
+												if rt, ok := sx.X.(*ast.Ident); ok && rt.Name == structInfo.StructName {
+													foundSecretMethod = true
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						if structInfo.Name != "" && foundSecretMethod {
+							pti.SecretManagers = append(pti.SecretManagers, structInfo)
 						}
 					}
 				}
