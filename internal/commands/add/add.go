@@ -25,6 +25,7 @@ const RESTResource = "resource"
 const WSResource = "ws"
 const EnvSecretManager = "envsecretmanager"
 const Postgres = "postgres"
+const RabbitMQ = "rabbitmqproducer"
 const WiringRouterFunctionName = "ConfigureRouter"
 const NewFunctionName = "New"
 const SecretFunctionName = "Secret"
@@ -138,7 +139,7 @@ func (a *Add) Execute(args []string) error {
 			"templates/rest/internal/config/provider.go.tmpl"); err != nil {
 			return err
 		}
-	} else if a.Args.ResourceType == Postgres {
+	} else if a.Args.ResourceType == Postgres || a.Args.ResourceType == RabbitMQ {
 		pti := &ProviderTemplateInput{}
 		pti.ModulePath = modPath
 
