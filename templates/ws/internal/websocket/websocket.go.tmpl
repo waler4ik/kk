@@ -2,9 +2,13 @@
 
 package websocket
 
-import "net/http"
+import (
+	"net/http"
+
+	"{{.ModulePath}}/internal/broadcast"
+)
 
 type Websocket interface {
-	Broadcast(data []byte) error
+	broadcast.Broadcast
 	Handler(http.ResponseWriter, *http.Request)
 }
