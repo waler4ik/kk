@@ -32,14 +32,19 @@ Creates and wires a websocket endpoint. It's based on Melody project (https://gi
 kk add ws rest/ws
 ```
 
+Adds a secret manager provider based on environment variables.
+```zsh
+kk add envsecretmanager
+```
+
 Adds a postgres provider.
 ```zsh
 kk add postgres
 ```
 
-Adds a secret manager provider based on environment variables.
+Adds a rabbitmq producer provider.
 ```zsh
-kk add envsecretmanager
+kk add rabbitmqproducer
 ```
 
 ## OpenAPI / Swagger interface
