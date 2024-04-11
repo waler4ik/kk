@@ -83,6 +83,8 @@ func (a *Add) Execute(args []string) error {
 
 		ti.RoutePath = a.Args.Path
 
+		ti.RouterType = tmpl.Chi
+
 		if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
 			return err
 		}

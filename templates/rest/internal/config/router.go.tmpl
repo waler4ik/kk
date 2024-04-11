@@ -3,27 +3,33 @@
 package config
 
 import (
+	"net/http"
+	{{if eq .RouterType "chi"}}
+	"github.com/go-chi/chi/v5"
+	{{else if eq .RouterType "gin"}}
+	"github.com/gin-gonic/gin"
+	{{end -}}
 	"{{.ModulePath}}/internal/api"
 	{{- range .Packages }}
 	"{{$.ModulePath}}/{{.RelPath}}"
   	{{- end }}
-	"net/http"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func ConfigureRouter(a *api.API) http.Handler {
+	{{- if eq .RouterType "chi"}}
 	r := chi.NewRouter()
-
 	ConfigureMiddleware(r)
 	{{- range .Packages }}
 	{{.Name}}.ConfigureRouter(a, r)
   	{{- end }}
 
-{{- if .WSPackages}}
+	{{- if .WSPackages}}
 	{{- range .WSPackages}}
 	r.HandleFunc({{.RoutePath}}, a.{{.NameCaps}}.Handler)
 	{{- end }}
-{{- end}}
-	return r
+	{{- end}}
+	return r 
+	{{- else}}
+	return nil
+	{{- end}}
 }

@@ -16,8 +16,14 @@ type StructInfo struct {
 	StructName string
 }
 
+const (
+	Chi = "chi"
+	Gin = "gin"
+)
+
 type Root struct {
 	ModulePath      string
+	RouterType      string
 	Packages        []Package
 	WSPackages      []WSPackage
 	ProviderStructs []StructInfo
