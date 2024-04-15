@@ -15,10 +15,10 @@ go install github.com/waler4ik/kk@latest
 After installation use `kk` command in your shell.
 
 ### Init command
-Creates a Golang REST server project without endpoints.
+Creates a Golang REST server project without endpoints. Chi is used as the default router.
 
 ```zsh
-kk init 
+$ kk init rest github.com/waler4ik/kk-example
 ```
 
 ### Add command
