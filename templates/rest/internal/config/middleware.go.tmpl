@@ -14,4 +14,11 @@ func ConfigureMiddleware(r *chi.Mux) {
 	r.Use(middleware.Recoverer)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 }
+{{else if eq .RouterType "gin"}}
+import (
+	"github.com/gin-gonic/gin"
+)
+
+func ConfigureMiddleware(ge *gin.Engine) {
+}
 {{end}}

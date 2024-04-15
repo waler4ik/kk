@@ -26,9 +26,13 @@ func ConfigureRouter(a *api.API) http.Handler {
 	{{- if .WSPackages}}
 	{{- range .WSPackages}}
 	r.HandleFunc({{.RoutePath}}, a.{{.NameCaps}}.Handler)
-	{{- end }}
 	{{- end}}
-	return r 
+	{{- end}}
+	return r
+	{{- else if eq .RouterType "gin"}}
+	ge := gin.Default()
+	ConfigureMiddleware(ge)
+	return ge.Handler()
 	{{- else}}
 	return nil
 	{{- end}}

@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/tangzero/inflector"
+	"github.com/waler4ik/kk/internal/parse"
 	"github.com/waler4ik/kk/internal/tmpl"
 	"github.com/waler4ik/kk/internal/walk"
 	"golang.org/x/mod/modfile"
@@ -65,8 +66,6 @@ func (a *Add) Execute(args []string) error {
 		return fmt.Errorf("readModulePath: %w", err)
 	}
 
-	templateDir := "templates/" + a.Args.ResourceType
-
 	if a.Args.ResourceType == RESTResource || a.Args.ResourceType == WSResource {
 		if a.Args.Path == "" {
 			return fmt.Errorf("path uri is missing")
@@ -83,7 +82,14 @@ func (a *Add) Execute(args []string) error {
 
 		ti.RoutePath = a.Args.Path
 
-		ti.RouterType = tmpl.Chi
+		routerType, err := parse.RouterType("internal/config/router.go")
+		if err != nil {
+			return fmt.Errorf("router type: %w", err)
+		}
+
+		ti.RouterType = routerType
+
+		templateDir := "templates/" + routerType + "/" + a.Args.ResourceType
 
 		if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
 			return err
@@ -120,6 +126,8 @@ func (a *Add) Execute(args []string) error {
 		if len(pti.SecretManagers) > 0 {
 			return fmt.Errorf("you already have a secret manager, try to delete it first and then rerun the add command")
 		}
+
+		templateDir := "templates/" + a.Args.ResourceType
 
 		if err := walk.Walk(a.Content, templateDir, "./", pti); err != nil {
 			return err
@@ -158,6 +166,8 @@ func (a *Add) Execute(args []string) error {
 		} else if smCount > 1 {
 			return fmt.Errorf("more than one secret manager found under providers, please choose only one")
 		}
+
+		templateDir := "templates/" + a.Args.ResourceType
 
 		if err := walk.Walk(a.Content, templateDir, "./", pti); err != nil {
 			return err
