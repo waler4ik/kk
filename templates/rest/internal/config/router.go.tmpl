@@ -35,6 +35,14 @@ func ConfigureRouter(a *api.API) http.Handler {
 	{{- range .Packages }}
 	{{.Name}}.ConfigureRouter(a, ge)
   	{{- end }}
+
+	{{- if .WSPackages}}
+	{{- range .WSPackages}}
+	ge.GET({{.RoutePath}}, func(c *gin.Context) {
+		a.{{.NameCaps}}.Handler(c.Writer, c.Request)
+	})
+	{{- end}}
+	{{- end}}
 	return ge.Handler()
 	{{- else}}
 	return nil
