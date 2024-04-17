@@ -18,7 +18,15 @@ After installation use `kk` command in your shell.
 Creates a Golang REST server project without endpoints. Chi is used as the default router.
 
 ```zsh
-$ kk init rest github.com/waler4ik/kk-example
+kk init rest github.com/waler4ik/kk-example
+```
+```zsh
+kk init -r chi rest github.com/waler4ik/kk-example
+```
+
+Create a Golang REST server project with gin router.
+```zsh
+kk init -r gin rest github.com/waler4ik/kk-example
 ```
 
 ### Add command
@@ -65,7 +73,8 @@ docker compose build && docker compose up -d
 ## Upcoming features (commands)
 - [x] Add websocket command
 - [x] Generate swagger/openapi specification command
-- [ ] Select router within init command (chi, gin, gorilla)
+- [x] Select router within init command (chi, gin, gorilla)
+- [ ] Add cucumber godog tests for main workflows, see https://github.com/cucumber/godog
 - [ ] Add kubernetes scripts command
 - [ ] Add github scripts command
 
