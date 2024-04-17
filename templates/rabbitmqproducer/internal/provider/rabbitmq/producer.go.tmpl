@@ -21,6 +21,7 @@ type config struct {
 	ExchangeKind string `env:"RBMQ_EXCHANGE_TYPE" envDefault:"topic"`
 }
 
+// RBMQProducer follows principles in https://www.rabbitmq.com/tutorials/tutorial-five-go
 type RBMQProducer struct {
 	log          func(string, ...any)
 	conn         *amqp.Connection

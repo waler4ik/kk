@@ -11,8 +11,11 @@ import (
 )
 
 type Arguments struct {
-	ModulePath  string `long:"modulepath" short:"m" description:"golang module path" default:"rename-or-delete-me"`
-	ProjectType string `long:"projecttype" short:"p" description:"golang project type e.g. rest, grpc, graphql" default:"rest"`
+	RouterType string `long:"router" short:"r" description:"http router e.g. chi, gin" default:"chi"`
+	Args       struct {
+		ProjectType string `positional-arg-name:"projecttype" description:"golang project type e.g. rest, grpc, graphql" default:"rest"`
+		ModulePath  string `positional-arg-name:"modulepath" description:"golang module path" default:"rename-or-delete-me"`
+	} `positional-args:"yes" required:"true"`
 }
 
 type Init struct {
@@ -26,13 +29,14 @@ type TemplateInput struct {
 }
 
 func (i *Init) Execute(args []string) error {
-	if i.ProjectType == "rest" {
-		rootFolder := strings.ToLower(path.Base(i.ModulePath))
-		if err := walk.Walk(i.Content, "templates/"+i.ProjectType, rootFolder, &TemplateInput{
+	if i.Args.ProjectType == "rest" {
+		rootFolder := strings.ToLower(path.Base(i.Args.ModulePath))
+		if err := walk.Walk(i.Content, "templates/"+i.Args.ProjectType, rootFolder, &TemplateInput{
 			Root: tmpl.Root{
-				ModulePath: i.ModulePath,
+				ModulePath: i.Args.ModulePath,
 				Packages:   []tmpl.Package{},
 				WSPackages: []tmpl.WSPackage{},
+				RouterType: i.RouterType,
 			},
 		}); err != nil {
 			return err
