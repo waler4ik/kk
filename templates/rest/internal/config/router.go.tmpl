@@ -32,6 +32,9 @@ func ConfigureRouter(a *api.API) http.Handler {
 	{{- else if eq .RouterType "gin"}}
 	ge := gin.Default()
 	ConfigureMiddleware(ge)
+	{{- range .Packages }}
+	{{.Name}}.ConfigureRouter(a, ge)
+  	{{- end }}
 	return ge.Handler()
 	{{- else}}
 	return nil
