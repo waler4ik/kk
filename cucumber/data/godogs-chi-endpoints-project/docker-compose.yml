@@ -1,0 +1,16 @@
+version: '3.1'
+services:
+  service:
+    image: server:dev
+    build:
+      context: .
+    restart: always
+    ports:
+      - "6060"
+      - "8080:8080"
+    networks:
+      - mynet
+      
+networks:
+  mynet:
+    driver: bridge

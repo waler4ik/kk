@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"os/exec"
 	"testing"
 
 	"github.com/cucumber/godog"
+	"github.com/waler4ik/kk/cucumber"
 )
 
 func TestFeatures(t *testing.T) {
@@ -14,7 +12,7 @@ func TestFeatures(t *testing.T) {
 		ScenarioInitializer: InitializeScenario,
 		Options: &godog.Options{
 			Format:   "pretty",
-			Paths:    []string{"features"},
+			Paths:    []string{"cucumber/features"},
 			TestingT: t, // Testing instance that will run subtests.
 		},
 	}
@@ -25,27 +23,10 @@ func TestFeatures(t *testing.T) {
 }
 
 func InitializeScenario(sc *godog.ScenarioContext) {
-	//sc.Step(`^there are (\d+) godogs$`, thereAreGodogs)
-	//sc.Step(`^I eat (\d+)$`, iEat)
-	//sc.Step(`^there should be (\d+) remaining$`, thereShouldBeRemaining)
-}
-
-func runCmdWithArgs(name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return fmt.Errorf("stderrpipe: %w", err)
-	}
-
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("start: %w", err)
-	}
-
-	slurp, _ := io.ReadAll(stderr)
-	fmt.Printf("%s\n", slurp)
-
-	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("wait: %w", err)
-	}
-	return nil
+	sc.Step(`^kk tool installed$`, cucumber.InstallKK)
+	sc.Step(`^a directory without folder (.*)$`, cucumber.CleanFolder)
+	sc.Step(`^I create a (.*) project with uri (.*)$`, cucumber.CreateProject)
+	sc.Step(`^(.*) contents are same as in (.*)$`, cucumber.CompareFolder)
+	sc.Step(`^I create a websocket with path (.*) in folder (.*)$`, cucumber.CreateWebSocket)
+	sc.Step(`^I create a resource with path (.*) in folder (.*)$`, cucumber.CreateRESTResource)
 }
