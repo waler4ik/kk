@@ -76,9 +76,8 @@ docker compose build && docker compose up -d
 - [x] Add websocket command
 - [x] Generate swagger/openapi specification command
 - [x] Select router within init command (chi, gin, gorilla)
-- [ ] Add cucumber godog tests for main workflows, see https://github.com/cucumber/godog
+- [x] Add cucumber godog tests for main workflows, see https://github.com/cucumber/godog
 - [ ] Add kubernetes scripts command
-- [ ] Add github scripts command
 
 ## Similar approaches 
 - https://github.com/hay-kot/scaffold It's a more general approach. It gives you the possibility to write and use your own templates.
