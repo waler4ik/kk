@@ -1,28 +1,32 @@
 package main
 
 import (
-	"os"
 	"testing"
+
+	"github.com/cucumber/godog"
+	"github.com/waler4ik/kk/cucumber"
 )
 
-func Test_main(t *testing.T) {
-	tests := []struct {
-		name string
-		args []string
-	}{
-		{
-			name: "init",
-			args: []string{"kk", "init", "--modulepath=github.com/yourworkspace/CoolModuleName"},
-		},
-		{
-			name: "add",
-			args: []string{"kk", "add", "resource", "customer"},
+func TestFeatures(t *testing.T) {
+	suite := godog.TestSuite{
+		ScenarioInitializer: InitializeScenario,
+		Options: &godog.Options{
+			Format:   "pretty",
+			Paths:    []string{"cucumber/features"},
+			TestingT: t, // Testing instance that will run subtests.
 		},
 	}
-	for _, tt := range tests {
-		os.Args = tt.args
-		t.Run(tt.name, func(t *testing.T) {
-			main()
-		})
+
+	if suite.Run() != 0 {
+		t.Fatal("non-zero status returned, failed to run feature tests")
 	}
+}
+
+func InitializeScenario(sc *godog.ScenarioContext) {
+	sc.Step(`^kk tool installed$`, cucumber.InstallKK)
+	sc.Step(`^a directory without folder (.*)$`, cucumber.CleanFolder)
+	sc.Step(`^I create a (.*) project with uri (.*)$`, cucumber.CreateProject)
+	sc.Step(`^(.*) contents are same as in (.*)$`, cucumber.CompareFolder)
+	sc.Step(`^I create a websocket with path (.*) in folder (.*)$`, cucumber.CreateWebSocket)
+	sc.Step(`^I create a resource with path (.*) in folder (.*)$`, cucumber.CreateRESTResource)
 }
