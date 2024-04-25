@@ -37,9 +37,14 @@ Creates and wires a REST resource endpoint
 kk add resource machines/data
 ```
 
-Creates and wires a websocket endpoint. It's based on Melody project (https://github.com/olahol/melody).
+Creates and wires a websocket endpoint. It's based on Melody project. See https://github.com/olahol/melody
 ```zsh
 kk add ws rest/ws
+```
+
+Creates and wires a prometheus metrics endpoint. See https://prometheus.io/docs/guides/go-application/
+```zsh
+$ kk add metrics /metrics
 ```
 
 Adds a secret manager provider based on environment variables.

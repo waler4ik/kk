@@ -24,6 +24,7 @@ import (
 
 const RESTResource = "resource"
 const WSResource = "ws"
+const Metrics = "metrics"
 const EnvSecretManager = "envsecretmanager"
 const Postgres = "postgres"
 const RabbitMQ = "rabbitmqproducer"
@@ -66,7 +67,9 @@ func (a *Add) Execute(args []string) error {
 		return fmt.Errorf("readModulePath: %w", err)
 	}
 
-	if a.Args.ResourceType == RESTResource || a.Args.ResourceType == WSResource {
+	if a.Args.ResourceType == RESTResource ||
+		a.Args.ResourceType == WSResource ||
+		a.Args.ResourceType == Metrics {
 		if a.Args.Path == "" {
 			return fmt.Errorf("path uri is missing")
 		}
@@ -94,9 +97,16 @@ func (a *Add) Execute(args []string) error {
 		if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
 			return err
 		}
-		if err := walk.Walk(a.Content, templateDir+"/internal", "internal", ti); err != nil {
-			return err
+
+		templateDirInternal := templateDir + "/internal"
+		if _, err := fs.Stat(a.Content, templateDirInternal); err == nil {
+			if err := walk.Walk(a.Content, templateDirInternal, "internal", ti); err != nil {
+				return err
+			}
+		} else if !errors.Is(err, fs.ErrNotExist) {
+			return fmt.Errorf("stat: %w", err)
 		}
+
 		if err := collectEndpointPackageInfoForWiring("internal/endpoints", ti); err != nil {
 			return err
 		}
