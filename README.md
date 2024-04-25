@@ -44,7 +44,7 @@ kk add ws rest/ws
 
 Creates and wires a prometheus metrics endpoint. See https://prometheus.io/docs/guides/go-application/
 ```zsh
-$ kk add metrics /metrics
+kk add metrics /metrics
 ```
 
 Adds a secret manager provider based on environment variables.
