@@ -2,7 +2,7 @@
     <img src="logo.png" width="300" height="350">
 </p>
 
-[![Go](https://github.com/waler4ik/kk/actions/workflows/go.yml/badge.svg)](https://github.com/waler4ik/kk/actions/workflows/go.yml)
+[![go test](https://github.com/waler4ik/kk/actions/workflows/go.yml/badge.svg)](https://github.com/waler4ik/kk/actions/workflows/go.yml)
 
 # kk - Golang boilerplate CLI tool
 > [!TIP]
