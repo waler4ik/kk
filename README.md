@@ -2,8 +2,9 @@
     <img src="logo.png" width="300" height="350">
 </p>
 
-[![Go](https://github.com/waler4ik/kk/actions/workflows/go.yml/badge.svg)](https://github.com/waler4ik/kk/actions/workflows/go.yml)
-
+[![go test](https://github.com/waler4ik/kk/actions/workflows/go.yml/badge.svg)](https://github.com/waler4ik/kk/actions/workflows/go.yml)
+[![version](https://img.shields.io/github/go-mod/go-version/waler4ik/kk?cache=1)](https://github.com/waler4ik/kk/blob/master/go.mod)
+[![license](https://img.shields.io/github/license/waler4ik/kk?cache=1)](LICENSE)
 # kk - Golang boilerplate CLI tool
 > [!TIP]
 > Create, setup and extend a Golang project like a puzzle in seconds
