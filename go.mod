@@ -1,6 +1,6 @@
 module github.com/waler4ik/kk
 
-go 1.20
+go 1.22
 
 require (
 	golang.org/x/mod v0.16.0
@@ -19,7 +19,7 @@ require (
 
 require (
 	github.com/cucumber/godog v0.14.0
-	github.com/jessevdk/go-flags v1.5.0 // indirect
-	github.com/tangzero/inflector v1.0.0 // indirect
+	github.com/jessevdk/go-flags v1.5.0
+	github.com/tangzero/inflector v1.0.0
 	golang.org/x/sys v0.18.0 // indirect
 )
