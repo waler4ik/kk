@@ -3,6 +3,7 @@
 </p>
 
 [![go test](https://github.com/waler4ik/kk/actions/workflows/go.yml/badge.svg)](https://github.com/waler4ik/kk/actions/workflows/go.yml)
+[![gosec Security Check](https://github.com/waler4ik/kk/actions/workflows/gosec.yml/badge.svg)](https://github.com/waler4ik/kk/actions/workflows/gosec.yml)
 [![version](https://img.shields.io/github/go-mod/go-version/waler4ik/kk?cache=1)](https://github.com/waler4ik/kk/blob/main/go.mod)
 [![license](https://img.shields.io/github/license/waler4ik/kk?cache=1)](LICENSE)
 # kk - Golang boilerplate CLI tool
