@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/waler4ik/godogs-rest-project/internal/api"
+	"github.com/waler4ik/godogs-rest-project/internal/model"
 )
 
 type Provider struct {
@@ -31,12 +32,12 @@ type QueryParameter struct {
 //	@Produce		json
 //	@Param			name	query		string	true	"name attribute in query"
 //	@Param			phone	query		string	false	"phone attribute in query"
-//	@Success		200	{array}		data.Datum
+//	@Success		200	{array}		*model.Datum
 //	@Failure		400	{object}	errors.ErrorResponse
 //	@Failure		404	{object}	errors.ErrorResponse
 //	@Failure		500	{object}	errors.ErrorResponse
 //	@Router			/machines/data [get]
-func (p Provider) GetData(ctx context.Context, qp QueryParameter) ([]*Datum, error) {
+func (p Provider) GetData(ctx context.Context, qp QueryParameter) ([]*model.Datum, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -48,12 +49,12 @@ func (p Provider) GetData(ctx context.Context, qp QueryParameter) ([]*Datum, err
 //	@Accept			json
 //	@Produce		json
 //	@Param			datumID	path		string	true	"Datum ID"
-//	@Success		200	{object}	data.Datum
+//	@Success		200	{object}	*model.Datum
 //	@Failure		400	{object}	errors.ErrorResponse
 //	@Failure		404	{object}	errors.ErrorResponse
 //	@Failure		500	{object}	errors.ErrorResponse
 //	@Router			/machines/data/{datumID} [get]
-func (p Provider) GetDatum(ctx context.Context, id string) (*Datum, error) {
+func (p Provider) GetDatum(ctx context.Context, id string) (*model.Datum, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -64,13 +65,13 @@ func (p Provider) GetDatum(ctx context.Context, id string) (*Datum, error) {
 //	@Tags			data
 //	@Accept			json
 //	@Produce		json
-//	@Param			datum	body		data.Datum	true	"Add datum"
-//	@Success		201		{object}	data.Datum
+//	@Param			datum	body		*model.Datum	true	"Add datum"
+//	@Success		201		{object}	*model.Datum
 //	@Failure		400		{object}	errors.ErrorResponse
 //	@Failure		404		{object}	errors.ErrorResponse
 //	@Failure		500		{object}	errors.ErrorResponse
 //	@Router			/machines/data [post]
-func (p Provider) CreateDatum(ctx context.Context, c *Datum) (*Datum, error) {
+func (p Provider) CreateDatum(ctx context.Context, c *model.Datum) (*model.Datum, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -82,13 +83,13 @@ func (p Provider) CreateDatum(ctx context.Context, c *Datum) (*Datum, error) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			datumID	path		string	true	"Datum ID"
-//	@Param			datum	body		data.Datum	true	"Update datum"
+//	@Param			datum	body		*model.Datum	true	"Update datum"
 //	@Success		200
 //	@Failure		400		{object}	errors.ErrorResponse
 //	@Failure		404		{object}	errors.ErrorResponse
 //	@Failure		500		{object}	errors.ErrorResponse
 //	@Router			/machines/data/{datumID} [put]
-func (p Provider) UpdateDatum(ctx context.Context, c *Datum) error {
+func (p Provider) UpdateDatum(ctx context.Context, c *model.Datum) error {
 	return fmt.Errorf("not implemented")
 }
 
@@ -105,6 +106,6 @@ func (p Provider) UpdateDatum(ctx context.Context, c *Datum) error {
 //	@Failure		404	{object}	errors.ErrorResponse
 //	@Failure		500	{object}	errors.ErrorResponse
 //	@Router			/machines/data/{datumID} [delete]
-func (p Provider) DeleteDatum(ctx context.Context, c *Datum) error {
+func (p Provider) DeleteDatum(ctx context.Context, c *model.Datum) error {
 	return fmt.Errorf("not implemented")
 }

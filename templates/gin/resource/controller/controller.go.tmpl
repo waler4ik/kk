@@ -10,6 +10,7 @@ import (
 
 	"{{.ModulePath}}/internal/api"
 	"{{.ModulePath}}/internal/errors"
+	"{{.ModulePath}}/internal/model"
 )
 
 type Controller struct {
@@ -54,7 +55,7 @@ func (c Controller) List{{.ResourceNamePlCaps}}(ctx *gin.Context) {
 }
 
 func (c Controller) Create{{.ResourceNameSgCaps}}(ctx *gin.Context) {
-	{{.ResourceNameSgLower}} := &{{.ResourceNameSgCaps}}{}
+	{{.ResourceNameSgLower}} := &model.{{.ResourceNameSgCaps}}{}
 	if err := ctx.ShouldBindJSON({{.ResourceNameSgLower}}); err != nil {
 		ctx.JSON(errors.New(http.StatusBadRequest, err))
 		return
@@ -69,12 +70,12 @@ func (c Controller) Create{{.ResourceNameSgCaps}}(ctx *gin.Context) {
 }
 
 func (c Controller) Get{{.ResourceNameSgCaps}}(ctx *gin.Context) {
-	{{.ResourceNameSgLower}} := ctx.Value({{.ResourceNameSgCaps}}CtxKey).(*{{.ResourceNameSgCaps}})
+	{{.ResourceNameSgLower}} := ctx.Value({{.ResourceNameSgCaps}}CtxKey).(*model.{{.ResourceNameSgCaps}})
 	ctx.JSON(http.StatusOK, {{.ResourceNameSgLower}})
 }
 
 func (c Controller) Update{{.ResourceNameSgCaps}}(ctx *gin.Context) {
-	{{.ResourceNameSgLower}} := ctx.Value({{.ResourceNameSgCaps}}CtxKey).(*{{.ResourceNameSgCaps}})
+	{{.ResourceNameSgLower}} := ctx.Value({{.ResourceNameSgCaps}}CtxKey).(*model.{{.ResourceNameSgCaps}})
 
 	if err := ctx.ShouldBindJSON({{.ResourceNameSgLower}}); err != nil {
 		ctx.JSON(errors.New(http.StatusBadRequest, err))
@@ -88,7 +89,7 @@ func (c Controller) Update{{.ResourceNameSgCaps}}(ctx *gin.Context) {
 }
 
 func (c Controller) Delete{{.ResourceNameSgCaps}}(ctx *gin.Context) {
-	{{.ResourceNameSgLower}} := ctx.Value({{.ResourceNameSgCaps}}CtxKey).(*{{.ResourceNameSgCaps}})
+	{{.ResourceNameSgLower}} := ctx.Value({{.ResourceNameSgCaps}}CtxKey).(*model.{{.ResourceNameSgCaps}})
 	if err := c.p.Delete{{.ResourceNameSgCaps}}(ctx, {{.ResourceNameSgLower}}); err != nil {
 		ctx.JSON(errors.New(http.StatusInternalServerError, err))
 		return

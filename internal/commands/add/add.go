@@ -15,6 +15,7 @@ import (
 
 	"github.com/tangzero/inflector"
 	"github.com/waler4ik/kk/internal/parse"
+	"github.com/waler4ik/kk/internal/pathchecker"
 	"github.com/waler4ik/kk/internal/tmpl"
 	"github.com/waler4ik/kk/internal/walk"
 	"golang.org/x/mod/modfile"
@@ -83,8 +84,6 @@ func (a *Add) Execute(args []string) error {
 
 		prepareResourceNames(a.Args.Path, ti)
 
-		ti.RoutePath = a.Args.Path
-
 		routerType, err := parse.RouterType("internal/config/router.go")
 		if err != nil {
 			return fmt.Errorf("router type: %w", err)
@@ -93,14 +92,16 @@ func (a *Add) Execute(args []string) error {
 		ti.RouterType = routerType
 
 		templateDir := "templates/" + routerType + "/" + a.Args.ResourceType
+		templateDirController := templateDir + "/controller"
 
-		if err := walk.Walk(a.Content, templateDir+"/controller", filepath.Clean("internal/endpoints"+a.Args.Path), ti); err != nil {
+		if err := walk.Walk(a.Content, templateDirController, filepath.Clean("internal/endpoints"+a.Args.Path),
+			ti, pathchecker.New(ti.PathBase, templateDirController)); err != nil {
 			return err
 		}
 
 		templateDirInternal := templateDir + "/internal"
 		if _, err := fs.Stat(a.Content, templateDirInternal); err == nil {
-			if err := walk.Walk(a.Content, templateDirInternal, "internal", ti); err != nil {
+			if err := walk.Walk(a.Content, templateDirInternal, "internal", ti, pathchecker.New(ti.PathBase, templateDirInternal)); err != nil {
 				return err
 			}
 		} else if !errors.Is(err, fs.ErrNotExist) {
@@ -111,14 +112,17 @@ func (a *Add) Execute(args []string) error {
 			return err
 		}
 
-		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", ti,
-			"templates/rest/internal/config/router.go.tmpl",
-			"templates/rest/internal/config/websockets.go.tmpl"); err != nil {
+		templateDirConfig := "templates/rest/internal/config"
+
+		if err := walk.Walk(a.Content, templateDirConfig, "internal/config", ti,
+			pathchecker.New(ti.PathBase, templateDirConfig, "templates/rest/internal/config/router.go.tmpl",
+				"templates/rest/internal/config/websockets.go.tmpl")); err != nil {
 			return err
 		}
 
-		if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", ti,
-			"templates/rest/internal/api/websockets.go.tmpl"); err != nil {
+		templateDirApi := "templates/rest/internal/api"
+		if err := walk.Walk(a.Content, templateDirApi, "internal/api", ti,
+			pathchecker.New(ti.PathBase, templateDirApi, "templates/rest/internal/api/websockets.go.tmpl")); err != nil {
 			return err
 		}
 	} else if a.Args.ResourceType == EnvSecretManager {
@@ -139,7 +143,7 @@ func (a *Add) Execute(args []string) error {
 
 		templateDir := "templates/" + a.Args.ResourceType
 
-		if err := walk.Walk(a.Content, templateDir, "./", pti); err != nil {
+		if err := walk.Walk(a.Content, templateDir, "./", pti, pathchecker.New("", templateDir)); err != nil {
 			return err
 		}
 
@@ -149,14 +153,14 @@ func (a *Add) Execute(args []string) error {
 		if err := collectProviderInfoForWiring("internal/provider", pti); err != nil {
 			return err
 		}
-
-		if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", pti,
-			"templates/rest/internal/api/provider.go.tmpl"); err != nil {
+		templateDirApi := "templates/rest/internal/api"
+		if err := walk.Walk(a.Content, templateDirApi, "internal/api", pti,
+			pathchecker.New("", templateDirApi, "templates/rest/internal/api/provider.go.tmpl")); err != nil {
 			return err
 		}
-
-		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", pti,
-			"templates/rest/internal/config/provider.go.tmpl"); err != nil {
+		templateDirConfig := "templates/rest/internal/config"
+		if err := walk.Walk(a.Content, templateDirConfig, "internal/config", pti,
+			pathchecker.New("", templateDirConfig, "templates/rest/internal/config/provider.go.tmpl")); err != nil {
 			return err
 		}
 	} else if a.Args.ResourceType == Postgres || a.Args.ResourceType == RabbitMQ {
@@ -179,7 +183,7 @@ func (a *Add) Execute(args []string) error {
 
 		templateDir := "templates/" + a.Args.ResourceType
 
-		if err := walk.Walk(a.Content, templateDir, "./", pti); err != nil {
+		if err := walk.Walk(a.Content, templateDir, "./", pti, pathchecker.New("", templateDir)); err != nil {
 			return err
 		}
 
@@ -187,13 +191,15 @@ func (a *Add) Execute(args []string) error {
 			return err
 		}
 
-		if err := walk.Walk(a.Content, "templates/rest/internal/api", "internal/api", pti,
-			"templates/rest/internal/api/provider.go.tmpl"); err != nil {
+		templateDirApi := "templates/rest/internal/api"
+		if err := walk.Walk(a.Content, templateDirApi, "internal/api", pti,
+			pathchecker.New("", templateDirApi, "templates/rest/internal/api/provider.go.tmpl")); err != nil {
 			return err
 		}
 
-		if err := walk.Walk(a.Content, "templates/rest/internal/config", "internal/config", pti,
-			"templates/rest/internal/config/provider.go.tmpl"); err != nil {
+		templateDirConfig := "templates/rest/internal/config"
+		if err := walk.Walk(a.Content, templateDirConfig, "internal/config", pti,
+			pathchecker.New("", templateDirConfig, "templates/rest/internal/config/provider.go.tmpl")); err != nil {
 			return err
 		}
 	} else {
@@ -215,8 +221,9 @@ func readModulePath() (string, error) {
 	}
 }
 
-func prepareResourceNames(resourcePath string, ti *ResourceTemplateInput) {
-	pathBase := path.Base(resourcePath)
+func prepareResourceNames(routePath string, ti *ResourceTemplateInput) {
+	ti.RoutePath = routePath
+	pathBase := path.Base(routePath)
 	ti.PathBase = pathBase
 	pathBasePl := inflector.Pluralize(pathBase)
 	ti.ResourceNamePlCaps = cases.Title(language.English).String(pathBasePl)
