@@ -10,6 +10,7 @@ import (
 
 	"github.com/waler4ik/godogs-rest-project/internal/api"
 	"github.com/waler4ik/godogs-rest-project/internal/errors"
+	"github.com/waler4ik/godogs-rest-project/internal/model"
 )
 
 type Controller struct {
@@ -54,7 +55,7 @@ func (c Controller) ListData(ctx *gin.Context) {
 }
 
 func (c Controller) CreateDatum(ctx *gin.Context) {
-	datum := &Datum{}
+	datum := &model.Datum{}
 	if err := ctx.ShouldBindJSON(datum); err != nil {
 		ctx.JSON(errors.New(http.StatusBadRequest, err))
 		return
@@ -69,12 +70,12 @@ func (c Controller) CreateDatum(ctx *gin.Context) {
 }
 
 func (c Controller) GetDatum(ctx *gin.Context) {
-	datum := ctx.Value(DatumCtxKey).(*Datum)
+	datum := ctx.Value(DatumCtxKey).(*model.Datum)
 	ctx.JSON(http.StatusOK, datum)
 }
 
 func (c Controller) UpdateDatum(ctx *gin.Context) {
-	datum := ctx.Value(DatumCtxKey).(*Datum)
+	datum := ctx.Value(DatumCtxKey).(*model.Datum)
 
 	if err := ctx.ShouldBindJSON(datum); err != nil {
 		ctx.JSON(errors.New(http.StatusBadRequest, err))
@@ -88,7 +89,7 @@ func (c Controller) UpdateDatum(ctx *gin.Context) {
 }
 
 func (c Controller) DeleteDatum(ctx *gin.Context) {
-	datum := ctx.Value(DatumCtxKey).(*Datum)
+	datum := ctx.Value(DatumCtxKey).(*model.Datum)
 	if err := c.p.DeleteDatum(ctx, datum); err != nil {
 		ctx.JSON(errors.New(http.StatusInternalServerError, err))
 		return

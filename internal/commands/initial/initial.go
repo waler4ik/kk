@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/waler4ik/kk/internal/pathchecker"
 	"github.com/waler4ik/kk/internal/tmpl"
 	"github.com/waler4ik/kk/internal/walk"
 )
@@ -31,14 +32,15 @@ type TemplateInput struct {
 func (i *Init) Execute(args []string) error {
 	if i.Args.ProjectType == "rest" {
 		rootFolder := strings.ToLower(path.Base(i.Args.ModulePath))
-		if err := walk.Walk(i.Content, "templates/"+i.Args.ProjectType, rootFolder, &TemplateInput{
+		templateDir := "templates/" + i.Args.ProjectType
+		if err := walk.Walk(i.Content, templateDir, rootFolder, &TemplateInput{
 			Root: tmpl.Root{
 				ModulePath: i.Args.ModulePath,
 				Packages:   []tmpl.Package{},
 				WSPackages: []tmpl.WSPackage{},
 				RouterType: i.RouterType,
 			},
-		}); err != nil {
+		}, pathchecker.New("", templateDir)); err != nil {
 			return err
 		}
 	} else {

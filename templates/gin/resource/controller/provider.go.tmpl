@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"{{.ModulePath}}/internal/api"
+	"{{.ModulePath}}/internal/model"
 )
 
 type Provider struct {
@@ -31,12 +32,12 @@ type QueryParameter struct {
 //	@Produce		json
 //	@Param			name	query		string	true	"name attribute in query"
 //	@Param			phone	query		string	false	"phone attribute in query"
-//	@Success		200	{array}		{{.PathBase}}.{{.ResourceNameSgCaps}}
+//	@Success		200	{array}		*model.{{.ResourceNameSgCaps}}
 //	@Failure		400	{object}	errors.ErrorResponse
 //	@Failure		404	{object}	errors.ErrorResponse
 //	@Failure		500	{object}	errors.ErrorResponse
 //	@Router			{{.RoutePath}} [get]
-func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParameter) ([]*{{.ResourceNameSgCaps}}, error) {
+func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParameter) ([]*model.{{.ResourceNameSgCaps}}, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -48,12 +49,12 @@ func (p Provider) Get{{.ResourceNamePlCaps}}(ctx context.Context, qp QueryParame
 //	@Accept			json
 //	@Produce		json
 //	@Param			{{.ResourceNameSgLower}}ID	path		string	true	"{{.ResourceNameSgCaps}} ID"
-//	@Success		200	{object}	{{.PathBase}}.{{.ResourceNameSgCaps}}
+//	@Success		200	{object}	*model.{{.ResourceNameSgCaps}}
 //	@Failure		400	{object}	errors.ErrorResponse
 //	@Failure		404	{object}	errors.ErrorResponse
 //	@Failure		500	{object}	errors.ErrorResponse
 //	@Router			{{.RoutePath}}/{ {{- .ResourceNameSgLower}}ID} [get]
-func (p Provider) Get{{.ResourceNameSgCaps}}(ctx context.Context, id string) (*{{.ResourceNameSgCaps}}, error) {
+func (p Provider) Get{{.ResourceNameSgCaps}}(ctx context.Context, id string) (*model.{{.ResourceNameSgCaps}}, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -64,13 +65,13 @@ func (p Provider) Get{{.ResourceNameSgCaps}}(ctx context.Context, id string) (*{
 //	@Tags			{{.ResourceNamePlLower}}
 //	@Accept			json
 //	@Produce		json
-//	@Param			{{.ResourceNameSgLower}}	body		{{.PathBase}}.{{.ResourceNameSgCaps}}	true	"Add {{.ResourceNameSgLower}}"
-//	@Success		201		{object}	{{.PathBase}}.{{.ResourceNameSgCaps}}
+//	@Param			{{.ResourceNameSgLower}}	body		*model.{{.ResourceNameSgCaps}}	true	"Add {{.ResourceNameSgLower}}"
+//	@Success		201		{object}	*model.{{.ResourceNameSgCaps}}
 //	@Failure		400		{object}	errors.ErrorResponse
 //	@Failure		404		{object}	errors.ErrorResponse
 //	@Failure		500		{object}	errors.ErrorResponse
 //	@Router			{{.RoutePath}} [post]
-func (p Provider) Create{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) (*{{.ResourceNameSgCaps}}, error) {
+func (p Provider) Create{{.ResourceNameSgCaps}}(ctx context.Context, c *model.{{.ResourceNameSgCaps}}) (*model.{{.ResourceNameSgCaps}}, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -82,13 +83,13 @@ func (p Provider) Create{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.Resou
 //	@Accept			json
 //	@Produce		json
 //	@Param			{{.ResourceNameSgLower}}ID	path		string	true	"{{.ResourceNameSgCaps}} ID"
-//	@Param			{{.ResourceNameSgLower}}	body		{{.PathBase}}.{{.ResourceNameSgCaps}}	true	"Update {{.ResourceNameSgLower}}"
+//	@Param			{{.ResourceNameSgLower}}	body		*model.{{.ResourceNameSgCaps}}	true	"Update {{.ResourceNameSgLower}}"
 //	@Success		200
 //	@Failure		400		{object}	errors.ErrorResponse
 //	@Failure		404		{object}	errors.ErrorResponse
 //	@Failure		500		{object}	errors.ErrorResponse
 //	@Router			{{.RoutePath}}/{ {{- .ResourceNameSgLower}}ID} [put]
-func (p Provider) Update{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
+func (p Provider) Update{{.ResourceNameSgCaps}}(ctx context.Context, c *model.{{.ResourceNameSgCaps}}) error {
 	return fmt.Errorf("not implemented")
 }
 
@@ -105,6 +106,6 @@ func (p Provider) Update{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.Resou
 //	@Failure		404	{object}	errors.ErrorResponse
 //	@Failure		500	{object}	errors.ErrorResponse
 //	@Router			{{.RoutePath}}/{ {{- .ResourceNameSgLower}}ID} [delete]
-func (p Provider) Delete{{.ResourceNameSgCaps}}(ctx context.Context, c *{{.ResourceNameSgCaps}}) error {
+func (p Provider) Delete{{.ResourceNameSgCaps}}(ctx context.Context, c *model.{{.ResourceNameSgCaps}}) error {
 	return fmt.Errorf("not implemented")
 }
